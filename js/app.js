@@ -1,717 +1,1537 @@
-/**
- * mCapital — Premium Investment Platform
- * Handcrafted Institutional Logic & Interactive Modules
- */
-
-let globalLeafletMap = null;
-
-const REGION_COORDS = {
-  'london': [51.5074, -0.1278],
-  'dubai': [25.2048, 55.2708],
-  'ny': [40.7128, -74.0060],
-  'dhaka': [23.8103, 90.4125]
-};
-
 document.addEventListener('DOMContentLoaded', () => {
-  initNavigation();
-  initMarketplaceFilters();
-  initOpportunityModal();
-  initPortfolioDashboard();
-  initHubSelector();
-  initLeafletGlobalMap();
-  initSearchOverlay();
-  initScrollReveal();
-  initCounterAnimation();
-  initScrollSpy();
-  initEcosystemProcessUI();
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+  }
+
+  initLenisSmoothScroll();
+  initGSAPStickyHeader();
+  initGSAPHeroSlider();
+  initGSAPNavBorderHover();
+  initGSAPMagneticButtons();
+  initActivitiesBentoAnimations();
+  initGoalDiscoveryPhysics();
+  initWaysToInvestAnimations();
+  initMonolithDealToggle();
+  initWorkflowStepperScroll();
+  initGlobalHubsMap();
+  initLeaderSlider();
+  initGlobalScrollTypographyMotion();
 });
 
-/* ==========================================================================
-   01. NAVIGATION & QUICK SEARCH OVERLAY
-   ========================================================================== */
-function initNavigation() {
-  const header = document.getElementById('siteHeader');
+/* -------------------------------------------------------------
+ * 0. INERTIA / MOMENTUM PHYSICS-BASED SMOOTH SCROLL (LENIS + GSAP)
+ * ------------------------------------------------------------- */
+function initLenisSmoothScroll() {
+  if (typeof Lenis === 'undefined') return;
+
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential luxury ease-out
+    orientation: 'vertical',
+    gestureOrientation: 'vertical',
+    smoothWheel: true,
+    wheelMultiplier: 0.95,
+    touchMultiplier: 1.5,
+    infinite: false
+  });
+
+  // 1:1 synchronization between Lenis and GSAP ScrollTrigger
+  lenis.on('scroll', ScrollTrigger.update);
+
+  gsap.ticker.add((time) => {
+    lenis.raf(time * 1000);
+  });
+
+  gsap.ticker.lagSmoothing(0);
+
+  // Smooth scroll to anchor links
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener('click', function (e) {
+      const targetId = this.getAttribute('href');
+      if (targetId && targetId !== '#' && document.querySelector(targetId)) {
+        e.preventDefault();
+        lenis.scrollTo(targetId, { offset: -20, duration: 1.4 });
+      }
+    });
+  });
+}
+
+/* -------------------------------------------------------------
+ * 0.1 GSAP STICKY HEADER SCROLL GLASSMORPHISM (PURE NEUTRAL GLASS)
+ * ------------------------------------------------------------- */
+function initGSAPStickyHeader() {
+  const header = document.getElementById('mainHeaderNav');
   if (!header) return;
 
-  function handleScroll() {
-    if (window.scrollY > 20) {
-      header.classList.add('bg-brandDark/85', 'backdrop-blur-md', 'border-b', 'border-white/10', 'shadow-2xl', 'py-3');
-      header.classList.remove('bg-transparent', 'border-transparent', 'py-4');
-    } else {
-      header.classList.remove('bg-brandDark/85', 'backdrop-blur-md', 'border-b', 'border-white/10', 'shadow-2xl', 'py-3');
-      header.classList.add('bg-transparent', 'border-transparent', 'py-4');
-    }
-  }
-
-  window.addEventListener('scroll', handleScroll);
-  handleScroll(); // Trigger initial state check
-}
-
-function initSearchOverlay() {
-  const searchBtn = document.getElementById('headerSearchBtn');
-  const searchOverlay = document.getElementById('searchOverlay');
-  const searchInput = document.getElementById('searchInput');
-  const searchCloseBtn = document.getElementById('searchCloseBtn');
-
-  if (!searchOverlay) return;
-
-  if (searchBtn) {
-    searchBtn.addEventListener('click', openSearch);
-  }
-
-  if (searchCloseBtn) {
-    searchCloseBtn.addEventListener('click', closeSearch);
-  }
-
-  searchOverlay.addEventListener('click', (e) => {
-    if (e.target === searchOverlay) closeSearch();
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-      e.preventDefault();
-      openSearch();
-    }
-    if (e.key === 'Escape' && searchOverlay.classList.contains('active')) {
-      closeSearch();
-    }
-  });
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase().trim();
-      const resultsContainer = document.getElementById('searchResults');
-      if (!resultsContainer) return;
-
-      if (!term) {
-        resultsContainer.innerHTML = '<span class="text-xs text-slate-400">Type a keyword to filter deal prospectuses...</span>';
-        return;
-      }
-
-      let matches = [];
-      if (term.includes('health') || term.includes('bd-hc') || term.includes('fund')) {
-        matches.push({ title: 'Specialized Healthcare Infrastructure Fund II', ticker: 'BD-HC-2026', link: '#opportunities' });
-      }
-      if (term.includes('solar') || term.includes('energy') || term.includes('bd-en') || term.includes('direct')) {
-        matches.push({ title: '500MW National Solar Grid Expansion Phase I', ticker: 'BD-EN-2026', link: '#opportunities' });
-      }
-      if (term.includes('dashboard') || term.includes('terminal') || term.includes('irr')) {
-        matches.push({ title: 'Investor Portfolio Terminal', ticker: 'LIVE-VALUATION', link: '#dashboard' });
-      }
-      if (term.includes('hub') || term.includes('london') || term.includes('dubai') || term.includes('nrb')) {
-        matches.push({ title: 'NRB Hosts & Global Advisory Network', ticker: '100-HUBS', link: '#global-hubs' });
-      }
-
-      if (matches.length > 0) {
-        resultsContainer.innerHTML = matches.map(m => `
-          <a href="${m.link}" onclick="closeSearch()" class="block p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition border border-slate-200/80 mb-2">
-            <span class="text-[10px] font-mono font-bold text-brandTeal uppercase block mb-0.5">${m.ticker}</span>
-            <span class="text-xs font-extrabold text-brandNavy block">${m.title}</span>
-          </a>
-        `).join('');
-      } else {
-        resultsContainer.innerHTML = '<span class="text-xs text-slate-400">No matching deals found. Try "Healthcare", "Solar", or "Terminal".</span>';
-      }
-    });
-  }
-}
-
-function openSearch() {
-  const searchOverlay = document.getElementById('searchOverlay');
-  const searchInput = document.getElementById('searchInput');
-  if (searchOverlay) {
-    searchOverlay.classList.add('active');
-    if (searchInput) {
-      setTimeout(() => searchInput.focus(), 100);
-    }
-  }
-}
-
-function closeSearch() {
-  const searchOverlay = document.getElementById('searchOverlay');
-  if (searchOverlay) {
-    searchOverlay.classList.remove('active');
-  }
-}
-
-/* ==========================================================================
-   02. MARKETPLACE STRATEGY TAB FILTERING
-   ========================================================================== */
-function initMarketplaceFilters() {
-  const tabLinks = document.querySelectorAll('.tab-link');
-  const dealCards = document.querySelectorAll('.opportunity-card');
-
-  tabLinks.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabLinks.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      const filter = tab.dataset.filter.toLowerCase();
-      
-      dealCards.forEach(card => {
-        const cat = card.dataset.category ? card.dataset.category.toLowerCase() : '';
-        if (filter === 'all' || cat.includes(filter)) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-  });
-}
-
-/* ==========================================================================
-   03. DEAL PROSPECTUS MODAL DRAWER
-   ========================================================================== */
-const DEAL_DATA = {
-  'healthcare-fund': {
-    ticker: 'BD-HC-2026',
-    title: 'Bangladesh Specialized Healthcare Infrastructure Fund II',
-    sector: 'Healthcare & Diagnostic Infrastructure',
-    location: 'Dhaka & Chittagong Commercial Hubs',
-    size: '$100,000,000 USD',
-    min: '$5,000 USD',
-    irr: '16.8% Net Target IRR',
-    tenure: '5 Years (Quarterly USD Dividends)',
-    progress: '72% Subscribed ($72.0M raised)',
-    overview: 'This institutional fund targets high-demand specialized medical diagnostic centers and tertiary oncology hospitals across secondary commercial hubs in Bangladesh. Supported by Bangladesh Bank outward repatriation guidelines.',
-    highlights: [
-      'Primary off-taker agreements with leading national health networks.',
-      'Quarterly USD-denominated dividend payouts directly into foreign accounts.',
-      'Independent custodian escrow by Standard Chartered Bank Trust Division.',
-      'Comprehensive ESG compliance certified under UNDP frameworks.'
-    ]
-  },
-  'solar-grid': {
-    ticker: 'BD-EN-2026',
-    title: '500MW National Solar Grid Expansion Phase I',
-    sector: 'Clean Energy Infrastructure PPA',
-    location: 'Sylhet Division',
-    size: '$50,000,000 USD',
-    min: '$15,000 USD',
-    irr: '18.5% Net Target IRR',
-    tenure: '7 Years',
-    progress: '88% Subscribed ($44.0M raised)',
-    overview: 'Utility-scale solar installation backed by a 20-year sovereign Power Purchase Agreement (PPA) with the Bangladesh Power Development Board (BPDB).',
-    highlights: [
-      '20-Year Sovereign PPA guarantee with sovereign credit rating alignment.',
-      'Inflation-indexed dividend yield structures.',
-      'Land acquisition and environmental clearance 100% complete.',
-      'Co-invested alongside Asian Development Bank (ADB) syndicate.'
-    ]
-  }
-};
-
-function initOpportunityModal() {
-  const modalOverlay = document.getElementById('oppModalOverlay');
-  const modalCloseBtn = document.getElementById('modalCloseBtn');
-  const modalContent = document.getElementById('modalContent');
-  const triggerBtns = document.querySelectorAll('.open-opp-modal');
-
-  triggerBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const dealKey = btn.dataset.deal;
-      const deal = DEAL_DATA[dealKey];
-      if (deal) {
-        renderModalContent(modalContent, deal);
-        openModal(modalOverlay);
-      }
-    });
-  });
-
-  if (modalCloseBtn) {
-    modalCloseBtn.addEventListener('click', () => closeModal(modalOverlay));
-  }
-
-  if (modalOverlay) {
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) closeModal(modalOverlay);
-    });
-  }
-}
-
-function renderModalContent(container, deal) {
-  container.innerHTML = `
-    <div style="margin-bottom: 20px;">
-      <span class="deal-ticker" style="margin-bottom: 8px; display: inline-block;">[TICKER: ${deal.ticker}]</span>
-      <h3 style="font-family: 'Newsreader', serif; font-size: 26px; font-weight: 400; color: #0B1F3B; margin-bottom: 4px;">${deal.title}</h3>
-      <span style="font-size: 12px; color: #667085;">Sector: <strong>${deal.sector}</strong> • Location: <strong>${deal.location}</strong></span>
-    </div>
-
-    <table class="prospectus-table-specs" style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px;">
-      <tr style="border-bottom: 1px solid #E2E5EC;"><td style="padding: 8px 0; color: #667085;">Target Fund Size</td><td style="text-align: right; font-weight: 700; color: #0B1F3B;">${deal.size}</td></tr>
-      <tr style="border-bottom: 1px solid #E2E5EC;"><td style="padding: 8px 0; color: #667085;">Min Commitment</td><td style="text-align: right; font-weight: 700; color: #0B1F3B;">${deal.min}</td></tr>
-      <tr style="border-bottom: 1px solid #E2E5EC;"><td style="padding: 8px 0; color: #667085;">Target Net IRR</td><td style="text-align: right; font-weight: 700; color: #075C4C;">${deal.irr}</td></tr>
-      <tr style="border-bottom: 1px solid #E2E5EC;"><td style="padding: 8px 0; color: #667085;">Tenure & Structure</td><td style="text-align: right; font-weight: 700; color: #0B1F3B;">${deal.tenure}</td></tr>
-    </table>
-
-    <div style="margin-bottom: 20px;">
-      <h4 style="font-size: 14px; font-weight: 600; color: #0B1F3B; margin-bottom: 6px;">Executive Summary</h4>
-      <p style="font-size: 13px; color: #525E75; line-height: 1.6;">${deal.overview}</p>
-    </div>
-
-    <div style="margin-bottom: 24px;">
-      <h4 style="font-size: 14px; font-weight: 600; color: #0B1F3B; margin-bottom: 6px;">Institutional Due-Diligence Highlights</h4>
-      <ul style="padding-left: 18px; font-size: 13px; color: #525E75; line-height: 1.6;">
-        ${deal.highlights.map(h => `<li style="margin-bottom: 4px;">${h}</li>`).join('')}
-      </ul>
-    </div>
-
-    <div style="display: flex; gap: 12px; border-top: 1px solid #E2E5EC; padding-top: 16px;">
-      <a href="#get-started" class="btn btn-primary" style="flex: 1; text-align: center; background: #0B1F3B; color: #fff; padding: 12px; border-radius: 9999px; font-size: 13px; font-weight: 700;" onclick="closeModal(document.getElementById('oppModalOverlay'))">Commit Capital</a>
-      <button class="btn btn-secondary" style="flex: 1; background: #FAF9F5; border: 1px solid #CBD5E1; color: #0B1F3B; padding: 12px; border-radius: 9999px; font-size: 13px; font-weight: 700;" onclick="alert('Downloading Data Room Prospectus (PDF)...')">Download Data Room</button>
-    </div>
-  `;
-}
-
-function openModal(overlay) {
-  if (!overlay) return;
-  overlay.classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(overlay) {
-  if (!overlay) return;
-  overlay.classList.remove('active');
-  document.body.style.overflow = 'auto';
-}
-
-/* ==========================================================================
-   04. PORTFOLIO TERMINAL PERIOD SWITCHER
-   ========================================================================== */
-const PERIOD_DATA = {
-  '1Y': {
-    val: '$284,650',
-    ret: '+$24,120',
-    irr: '17.2%',
-    moic: '1.24x',
-    path: 'M60 170 Q 160 160, 260 145 T 460 110 T 640 60',
-    poly: '60,170 160,160 260,145 360,130 460,110 560,85 640,60 640,190 60,190'
-  },
-  '3Y': {
-    val: '$284,650',
-    ret: '+$42,850',
-    irr: '18.7%',
-    moic: '1.42x',
-    path: 'M60 180 Q 160 160, 260 135 T 460 75 T 640 42',
-    poly: '60,180 160,160 260,135 360,110 460,75 560,55 640,42 640,190 60,190'
-  },
-  'ALL': {
-    val: '$284,650',
-    ret: '+$88,400',
-    irr: '20.4%',
-    moic: '1.68x',
-    path: 'M60 185 Q 160 140, 260 110 T 460 60 T 640 30',
-    poly: '60,185 160,140 260,110 360,85 460,60 560,45 640,30 640,190 60,190'
-  }
-};
-
-function initPortfolioDashboard() {
-  const periodBtns = document.querySelectorAll('.period-btn');
-  const valEl = document.getElementById('dbPortfolioVal');
-  const retEl = document.getElementById('dbTotalReturn');
-  const irrEl = document.getElementById('dbIrr');
-  const moicEl = document.getElementById('dbMoic');
-  const chartPath = document.getElementById('chartPath');
-  const chartArea = document.getElementById('chartArea');
-
-  periodBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      periodBtns.forEach(b => {
-        b.classList.remove('active');
-        b.classList.remove('bg-brandTeal');
-        b.classList.add('text-slate-400');
-      });
-
-      btn.classList.add('active', 'bg-brandTeal');
-      btn.classList.remove('text-slate-400');
-      btn.classList.add('text-white');
-
-      const period = btn.dataset.period;
-      const data = PERIOD_DATA[period];
-
-      if (data) {
-        if (valEl) valEl.textContent = data.val;
-        if (retEl) retEl.textContent = data.ret;
-        if (irrEl) irrEl.textContent = data.irr;
-        if (moicEl) moicEl.textContent = data.moic;
-
-        if (chartPath && chartArea) {
-          chartPath.setAttribute('d', data.path);
-          chartArea.setAttribute('points', data.poly);
-        }
-      }
-    });
-  });
-}
-
-/* ==========================================================================
-   05. LEAFLET INTERACTIVE GLOBAL MAP WITH TRAJECTORY ARCS
-   ========================================================================== */
-function initLeafletGlobalMap() {
-  const mapContainer = document.getElementById('leafletGlobalMap');
-  if (!mapContainer || typeof L === 'undefined') return;
-
-  globalLeafletMap = L.map('leafletGlobalMap', {
-    center: [23.0, 55.0],
-    zoom: 2.3,
-    minZoom: 1.5,
-    maxZoom: 6,
-    zoomControl: false,
-    scrollWheelZoom: false
-  });
-
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; CartoDB &copy; OpenStreetMap',
-    subdomains: 'abcd',
-    maxZoom: 19
-  }).addTo(globalLeafletMap);
-
-  L.control.zoom({ position: 'bottomright' }).addTo(globalLeafletMap);
-
-  const DHAKA = [23.8103, 90.4125];
-
-  const HUBS = [
-    { name: 'London HQ', lat: 51.5074, lng: -0.1278, count: '3,450' },
-    { name: 'Dubai DIFC', lat: 25.2048, lng: 55.2708, count: '4,800' },
-    { name: 'New York', lat: 40.7128, lng: -74.0060, count: '2,600' },
-    { name: 'Toronto', lat: 43.6532, lng: -79.3832, count: '1,200' },
-    { name: 'Geneva', lat: 46.2044, lng: 6.1432, count: '850' },
-    { name: 'Frankfurt', lat: 50.1109, lng: 8.6821, count: '920' },
-    { name: 'Riyadh', lat: 24.7136, lng: 46.6753, count: '3,100' },
-    { name: 'Jeddah', lat: 21.5433, lng: 39.1728, count: '1,800' },
-    { name: 'Doha', lat: 25.2854, lng: 51.5310, count: '1,650' },
-    { name: 'Abu Dhabi', lat: 24.4539, lng: 54.3773, count: '1,400' },
-    { name: 'Singapore', lat: 1.3521, lng: 103.8198, count: '1,150' },
-    { name: 'Kuala Lumpur', lat: 3.1390, lng: 101.6869, count: '1,950' },
-    { name: 'Tokyo', lat: 35.6762, lng: 139.6503, count: '640' }
-  ];
-
-  const dhakaIcon = L.divIcon({
-    className: 'custom-dhaka-marker',
-    html: `
-      <div class="relative flex items-center justify-center">
-        <span class="absolute w-12 h-12 rounded-full bg-red-500/40 animate-ping"></span>
-        <span class="absolute w-8 h-8 rounded-full bg-accentLime/50 animate-pulse"></span>
-        <span class="relative w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-lg"></span>
-      </div>
-    `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
-  });
-
-  const dhakaMarker = L.marker(DHAKA, { icon: dhakaIcon }).addTo(globalLeafletMap);
-  dhakaMarker.bindTooltip('<div class="px-3 py-1 font-black text-xs bg-red-600 text-white rounded-lg shadow-xl">DHAKA CAPITAL HQ 🇧🇩</div>', {
-    permanent: true,
-    direction: 'top',
-    offset: [0, -12]
-  });
-
-  HUBS.forEach(hub => {
-    const latlngs = getCurvedPoints(DHAKA, [hub.lat, hub.lng]);
-    L.polyline(latlngs, {
-      color: '#A8F01D',
-      weight: 1.5,
-      opacity: 0.55,
-      dashArray: '4, 6'
-    }).addTo(globalLeafletMap);
-
-    const hubIcon = L.divIcon({
-      className: 'custom-hub-marker',
-      html: `
-        <div class="relative flex items-center justify-center">
-          <span class="absolute w-5 h-5 rounded-full bg-accentLime/40 animate-ping"></span>
-          <span class="w-2.5 h-2.5 rounded-full bg-accentLime border border-slate-900 shadow-md"></span>
-        </div>
-      `,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8]
-    });
-
-    const marker = L.marker([hub.lat, hub.lng], { icon: hubIcon }).addTo(globalLeafletMap);
-    marker.bindTooltip(`
-      <div class="p-2 bg-slate-900 text-white rounded-xl shadow-2xl border border-white/10 text-xs">
-        <strong class="block text-accentLime font-bold">${hub.name}</strong>
-        <span class="text-[11px] text-slate-300">${hub.count} Verified NRB Investors</span>
-      </div>
-    `, { direction: 'top', offset: [0, -6] });
-  });
-}
-
-function getCurvedPoints(start, end) {
-  const points = [];
-  const lat1 = start[0], lng1 = start[1];
-  const lat2 = end[0], lng2 = end[1];
-
-  const midLat = (lat1 + lat2) / 2 + (lng2 > lng1 ? 10 : -10);
-  const midLng = (lng1 + lng2) / 2;
-
-  for (let t = 0; t <= 1; t += 0.05) {
-    const lat = Math.pow(1 - t, 2) * lat1 + 2 * (1 - t) * t * midLat + Math.pow(t, 2) * lat2;
-    const lng = Math.pow(1 - t, 2) * lng1 + 2 * (1 - t) * t * midLng + Math.pow(t, 2) * lng2;
-    points.push([lat, lng]);
-  }
-  return points;
-}
-
-function initHubSelector() {
-  const hubCards = document.querySelectorAll('.hub-card');
-  hubCards.forEach(card => {
-    card.addEventListener('click', () => {
-      hubCards.forEach(c => c.classList.remove('ring-2', 'ring-accentLime', 'bg-white/10'));
-      card.classList.add('ring-2', 'ring-accentLime', 'bg-white/10');
-
-      const region = card.dataset.region;
-      const coords = REGION_COORDS[region];
-      if (coords && globalLeafletMap) {
-        globalLeafletMap.flyTo(coords, 4.5, { duration: 1.5 });
-      }
-    });
-  });
-}
-
-/* ==========================================================================
-   08. SMOOTH SCROLL REVEAL & HERO SCROLLSPY TAB TRACKER
-   ========================================================================== */
-function initScrollReveal() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('reveal-active');
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-  document.querySelectorAll('.reveal-left, .reveal-right, .reveal-up').forEach(el => {
-    observer.observe(el);
-  });
-}
-
-function initScrollSpy() {
-  const tabs = document.querySelectorAll('.hero-tab-pill');
-  if (!tabs.length) return;
-
-  const sections = [
-    document.getElementById('trust-leadership'),
-    document.getElementById('opportunities'),
-    document.getElementById('get-started')
-  ];
-
   window.addEventListener('scroll', () => {
-    let currentSectionIdx = 0;
-    const scrollPos = window.scrollY + 250;
-
-    sections.forEach((sec, idx) => {
-      if (sec && scrollPos >= sec.offsetTop) {
-        currentSectionIdx = idx;
-      }
-    });
-
-    tabs.forEach((tab, idx) => {
-      if (idx === currentSectionIdx) {
-        tab.classList.add('bg-white', 'text-slate-950', 'shadow-lg');
-        tab.classList.remove('bg-white/10', 'text-white/90');
-      } else {
-        tab.classList.remove('bg-white', 'text-slate-950', 'shadow-lg');
-        tab.classList.add('bg-white/10', 'text-white/90');
-      }
-    });
+    if (window.scrollY > 40) {
+      header.classList.add('bg-black/40', 'backdrop-blur-md', 'shadow-lg', 'fixed');
+      header.classList.remove('absolute', 'bg-transparent');
+    } else {
+      header.classList.remove('bg-black/40', 'backdrop-blur-md', 'shadow-lg', 'fixed');
+      header.classList.add('absolute', 'bg-transparent');
+    }
   });
 }
 
-/* ==========================================================================
-   09. ECOSYSTEM PROCESS UI INTERACTIVE WORKFLOW
-   ========================================================================== */
-function initEcosystemProcessUI() {
-  const stepBtns = document.querySelectorAll('.eco-step-btn');
-  const stepCards = document.querySelectorAll('.eco-card');
-  const titleEl = document.getElementById('ecoProcessTitle');
-  const badgeEl = document.getElementById('ecoProcessBadge');
-  const contentEl = document.getElementById('ecoProcessContent');
+/* -------------------------------------------------------------
+ * 1. FULL-WIDTH HERO 3D SKEW & ANGLE PERSPECTIVE SLIDER
+ * ------------------------------------------------------------- */
+const heroSlidesData = [
+  {
+    preTitle: "YOUR PARTNER FOR GROWTH",
+    title: "Connecting millions of Non-Resident Bangladeshis.",
+    desc: "Investing Together to Build Better Bangladesh."
+  },
+  {
+    preTitle: "SOVEREIGN & BSEC REGULATED",
+    title: "Transparent Wealth Growth & Sovereign Sukuks",
+    desc: "Empowering global investors with vetted enterprise deals, export trade liquidity, and BSEC-regulated security."
+  }
+];
 
-  if (!stepCards.length) return;
+let heroCurrentIndex = 0;
+let heroSliderTimer = null;
+let isAnimatingSlide = false;
 
-  const PROCESS_DATA = {
-    1: {
-      title: "Stage 01 — NRB Investor / mCapital Member Allocation",
-      badge: "ACTIVE STAGE 1 OF 4",
-      col1: { label: "Primary Responsibility", text: "Non-Resident Bangladeshi investors accessing institutionally curated Funds and direct Private Equity deals." },
-      col2: { label: "Compliance & Custody", text: "Escrow-backed commitments protected by Bangladesh Bank FX repatriation guidelines & BSEC regulations." },
-      col3: { label: "Ecosystem Outcome", text: "Instant digital onboarding, automated quarterly dividends, and full portfolio visibility." }
-    },
-    2: {
-      title: "Stage 02 — Investment Sponsor Deal Origination",
-      badge: "ACTIVE STAGE 2 OF 4",
-      col1: { label: "Primary Responsibility", text: "Sponsors who propose and champion vetted high-growth infrastructure, tech, and impact investments for platform funding." },
-      col2: { label: "Diligence & Milestone", text: "5-step independent due diligence, prospectus verification, and milestone-tranche capital disbursement." },
-      col3: { label: "Ecosystem Outcome", text: "Direct diaspora capital syndication and transparent milestone reporting to all backers." }
-    },
-    3: {
-      title: "Stage 03 — Fund Manager Structuring & Governance",
-      badge: "ACTIVE STAGE 3 OF 4",
-      col1: { label: "Primary Responsibility", text: "Licensed professionals who structure institutional PE Funds, manage capital calls, and oversee portfolio assets." },
-      col2: { label: "Governance Engine", text: "Audit oversight, automated capital calls, and transparent valuation benchmarks (IRR & MOIC)." },
-      col3: { label: "Ecosystem Outcome", text: "Seamless automated distribution of dividends and quarterly audited performance reports." }
-    },
-    4: {
-      title: "Stage 04 — NRB Host Global Advisory Hubs",
-      badge: "ACTIVE STAGE 4 OF 4",
-      col1: { label: "Primary Responsibility", text: "Local hosts operating our network of 100 global advisory hubs across 30 countries worldwide." },
-      col2: { label: "Community & Concierge", text: "In-person investor onboarding, local currency advice, and private banking concierge access." },
-      col3: { label: "Ecosystem Outcome", text: "Global presence with local trust — bridging diaspora members in UK, US, UAE, and Asia." }
-    }
-  };
+function triggerLiquidWave() {
+  const displacement = document.getElementById('liquidDisplacement');
+  if (!displacement) return;
 
-  function activateStep(stepNum) {
-    stepBtns.forEach(btn => {
-      const bStep = btn.dataset.step;
-      const circle = btn.querySelector('div');
-      const text = btn.querySelector('span');
-      if (bStep === String(stepNum)) {
-        btn.classList.add('active');
-        if (circle) circle.className = "w-12 h-12 rounded-full bg-brandNavy text-white font-mono text-sm font-extrabold flex items-center justify-center shadow-lg ring-4 ring-[#FAF9F5] scale-110 transition-all";
-        if (text) text.className = "text-xs font-black uppercase text-brandNavy tracking-wider";
+  gsap.fromTo(displacement, 
+    { attr: { scale: 35 } },
+    { attr: { scale: 0 }, duration: 0.9, ease: 'power2.out' }
+  );
+}
+
+// Progress Bar Updates Synchronized with Step Indicator
+function updateProgressBar(targetIdx, duration = 0.8) {
+  const progressBar = document.getElementById('heroProgressBar');
+  if (!progressBar) return;
+
+  const totalSlides = heroSlidesData.length;
+  const segmentWidth = 100 / totalSlides; // 50%
+  const targetLeft = targetIdx * segmentWidth; // 0% or 50%
+
+  gsap.to(progressBar, {
+    left: targetLeft + '%',
+    width: segmentWidth + '%',
+    duration: duration,
+    ease: 'power3.out'
+  });
+}
+
+function initGSAPHeroSlider() {
+  const sliderSection = document.getElementById('heroSliderSection');
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  const preTitleEl = document.getElementById('heroPreTitle');
+  const titleEl = document.getElementById('heroSlideTitle');
+  const descEl = document.getElementById('heroSlideDesc');
+
+  if (!slides.length || !titleEl || !sliderSection) return;
+
+  // Master Slide Layer Setup for 3D Perspective
+  function resetSlideLayers(activeIdx) {
+    slides.forEach((slide, sIdx) => {
+      if (sIdx === activeIdx) {
+        slide.style.zIndex = '10';
+        slide.style.opacity = '1';
+        slide.style.pointerEvents = 'auto';
+        gsap.set(slide, { xPercent: 0, rotateY: 0, skewY: 0, scale: 1, z: 0 });
       } else {
-        btn.classList.remove('active');
-        if (circle) circle.className = "w-12 h-12 rounded-full bg-white border-2 border-slate-300 text-slate-700 font-mono text-sm font-extrabold flex items-center justify-center shadow-md ring-4 ring-[#FAF9F5] hover:border-brandTeal hover:text-brandTeal transition-all";
-        if (text) text.className = "text-xs font-bold uppercase text-slate-500 tracking-wider hover:text-brandNavy";
+        slide.style.zIndex = '5';
+        slide.style.opacity = '0';
+        slide.style.pointerEvents = 'none';
+        gsap.set(slide, { xPercent: 100, rotateY: -15, skewY: 3, scale: 0.92, z: -100 });
       }
     });
-
-    stepCards.forEach(card => {
-      const cStep = card.dataset.stepCard;
-      const stepBadge = card.querySelector('span.font-mono');
-      if (cStep === String(stepNum)) {
-        card.classList.add('border-2', 'border-brandNavy', 'shadow-xl');
-        card.classList.remove('border-slate-200/90', 'shadow-sm');
-        if (stepBadge) stepBadge.className = "font-mono text-xs font-black text-white bg-brandNavy px-3 py-1 rounded-full uppercase";
-      } else {
-        card.classList.remove('border-2', 'border-brandNavy', 'shadow-xl');
-        card.classList.add('border-slate-200/90', 'shadow-sm');
-        if (stepBadge) stepBadge.className = "font-mono text-xs font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full uppercase";
-      }
-    });
-
-    const data = PROCESS_DATA[stepNum];
-    if (data && titleEl && badgeEl && contentEl) {
-      titleEl.textContent = data.title;
-      badgeEl.textContent = data.badge;
-      contentEl.innerHTML = `
-        <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <span class="text-[11px] font-bold text-slate-400 uppercase block mb-2">${data.col1.label}</span>
-          <p class="text-sm text-slate-200 font-medium">${data.col1.text}</p>
-        </div>
-        <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <span class="text-[11px] font-bold text-slate-400 uppercase block mb-2">${data.col2.label}</span>
-          <p class="text-sm text-slate-200 font-medium">${data.col2.text}</p>
-        </div>
-        <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <span class="text-[11px] font-bold text-slate-400 uppercase block mb-2">${data.col3.label}</span>
-          <p class="text-sm text-accentLime font-extrabold">${data.col3.text}</p>
-        </div>
-      `;
-    }
   }
 
-  stepBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const step = btn.dataset.step;
-      activateStep(step);
-    });
-  });
+  resetSlideLayers(heroCurrentIndex);
 
-  stepCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const step = card.dataset.stepCard;
-      activateStep(step);
-    });
-  });
-}
+  function updateTextAndDots(targetIdx, direction = 'next') {
+    heroCurrentIndex = targetIdx;
 
-/* ==========================================================================
-   08. SCROLL REVEAL INTERSECTION OBSERVER
-   ========================================================================== */
-function initScrollReveal() {
-  const revealElements = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-zoom');
-  if (!revealElements.length) return;
-
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px 0px -50px 0px',
-    threshold: 0.12
-  };
-
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('reveal-active');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, observerOptions);
-
-  revealElements.forEach(el => observer.observe(el));
-}
-
-/* ==========================================================================
-   09. METRICS COUNTER ANIMATION
-   ========================================================================== */
-function initCounterAnimation() {
-  const counters = document.querySelectorAll('.stat-counter');
-  if (!counters.length) return;
-
-  const animateCounter = (el) => {
-    const target = parseFloat(el.dataset.target);
-    const prefix = el.dataset.prefix || '';
-    const suffix = el.dataset.suffix || '';
-    const decimals = parseInt(el.dataset.decimals || '0', 10);
-    const formatComma = el.dataset.format === 'comma';
-    const duration = 2000;
-    const startTime = performance.now();
-
-    const updateCount = (currentTime) => {
-      const elapsedTime = currentTime - startTime;
-      const progress = Math.min(elapsedTime / duration, 1);
-      const easeProgress = 1 - Math.pow(1 - progress, 3);
-      const currentVal = target * easeProgress;
-
-      let formattedVal = currentVal.toFixed(decimals);
-      if (formatComma) {
-        formattedVal = Math.floor(currentVal).toLocaleString('en-US');
-      }
-
-      el.textContent = `${prefix}${formattedVal}${suffix}`;
-
-      if (progress < 1) {
-        requestAnimationFrame(updateCount);
+    // Update Step Indicator Dots
+    dots.forEach((dot, dIdx) => {
+      if (dIdx === heroCurrentIndex) {
+        dot.classList.add('bg-gold-500', 'w-6');
+        dot.classList.remove('bg-white/40', 'w-3');
       } else {
-        let finalVal = target.toFixed(decimals);
-        if (formatComma) {
-          finalVal = target.toLocaleString('en-US');
-        }
-        el.textContent = `${prefix}${finalVal}${suffix}`;
-      }
-    };
-
-    requestAnimationFrame(updateCount);
-  };
-
-  const observerOptions = {
-    root: null,
-    threshold: 0.2
-  };
-
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        animateCounter(entry.target);
-        obs.unobserve(entry.target);
+        dot.classList.remove('bg-gold-500', 'w-6');
+        dot.classList.add('bg-white/40', 'w-3');
       }
     });
-  }, observerOptions);
 
-  counters.forEach(counter => observer.observe(counter));
+    // Crossfade & Slide Text with 3D Depth
+    gsap.to([preTitleEl, titleEl, descEl], {
+      opacity: 0,
+      y: direction === 'next' ? -12 : 12,
+      duration: 0.25,
+      ease: 'power2.in',
+      onComplete: () => {
+        const data = heroSlidesData[heroCurrentIndex];
+        if (preTitleEl) preTitleEl.innerText = data.preTitle;
+        titleEl.innerText = data.title;
+        descEl.innerText = data.desc;
+
+        gsap.fromTo([preTitleEl, titleEl, descEl], 
+          { opacity: 0, y: direction === 'next' ? 16 : -16 },
+          { opacity: 1, y: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out' }
+        );
+      }
+    });
+  }
+
+  function changeSlideAutoOrClick(targetIdx, direction = 'next') {
+    if (targetIdx === heroCurrentIndex || isAnimatingSlide) return;
+    isAnimatingSlide = true;
+
+    triggerLiquidWave();
+    updateProgressBar(targetIdx, 1.0);
+
+    const currentSlide = slides[heroCurrentIndex];
+    const nextSlide = slides[targetIdx];
+
+    if (currentSlide && nextSlide) {
+      currentSlide.style.zIndex = '10';
+      nextSlide.style.zIndex = '20';
+      nextSlide.style.pointerEvents = 'auto';
+
+      const outX = direction === 'next' ? -100 : 100;
+      const outRotY = direction === 'next' ? 18 : -18;
+      const outSkewY = direction === 'next' ? -3 : 3;
+
+      const inX = direction === 'next' ? 100 : -100;
+      const inRotY = direction === 'next' ? -18 : 18;
+      const inSkewY = direction === 'next' ? 3 : -3;
+
+      // 3D Angle Skew Exit Animation
+      gsap.to(currentSlide, {
+        xPercent: outX,
+        rotateY: outRotY,
+        skewY: outSkewY,
+        scale: 0.92,
+        z: -120,
+        opacity: 0,
+        duration: 1.0,
+        ease: 'power3.inOut'
+      });
+
+      // 3D Angle Skew Entrance Animation
+      gsap.fromTo(nextSlide, 
+        { 
+          xPercent: inX, 
+          rotateY: inRotY, 
+          skewY: inSkewY, 
+          scale: 0.92, 
+          z: -120, 
+          opacity: 0 
+        },
+        { 
+          xPercent: 0, 
+          rotateY: 0, 
+          skewY: 0, 
+          scale: 1.0, 
+          z: 0, 
+          opacity: 1, 
+          duration: 1.05, 
+          ease: 'power3.inOut',
+          onComplete: () => {
+            resetSlideLayers(targetIdx);
+            isAnimatingSlide = false;
+          }
+        }
+      );
+
+      const nextBg = nextSlide.querySelector('.hero-slide-bg');
+      if (nextBg) {
+        gsap.fromTo(nextBg, { scale: 1.1 }, { scale: 1.05, duration: 2.5, ease: 'power2.out' });
+      }
+    } else {
+      isAnimatingSlide = false;
+    }
+
+    updateTextAndDots(targetIdx, direction);
+  }
+
+  // ----------------------------------------------------------------
+  // INTERACTIVE 3D SKEW & ANGLE DRAG PHYSICS
+  // ----------------------------------------------------------------
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+  let activeTargetSlide = null;
+  let dragDirection = 'none';
+  let targetIdx = 0;
+
+  function onDragStart(e) {
+    if (isAnimatingSlide) return;
+    if (e.target.closest('a, button, input')) return;
+
+    isDragging = true;
+    startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    currentX = startX;
+    dragDirection = 'none';
+    activeTargetSlide = null;
+
+    sliderSection.classList.add('cursor-grabbing');
+    clearInterval(heroSliderTimer);
+  }
+
+  function onDragMove(e) {
+    if (!isDragging) return;
+    
+    currentX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const diffX = currentX - startX;
+    
+    const dragSensitivity = Math.max(700, window.innerWidth * 0.55);
+
+    if (Math.abs(diffX) < 4) return;
+
+    const nextIdx = (heroCurrentIndex + 1) % slides.length;
+    const prevIdx = (heroCurrentIndex - 1 + slides.length) % slides.length;
+    const currentSlide = slides[heroCurrentIndex];
+
+    if (diffX < 0) {
+      // Dragging left -> angled next slide emerges from right
+      dragDirection = 'next';
+      targetIdx = nextIdx;
+      activeTargetSlide = slides[nextIdx];
+
+      const progress = Math.min(1, Math.max(0, -diffX / dragSensitivity));
+      
+      // Angle Current Slide away
+      gsap.set(currentSlide, {
+        xPercent: -progress * 70,
+        rotateY: progress * 15,
+        skewY: -progress * 3,
+        scale: 1 - progress * 0.08,
+        z: -progress * 100,
+        opacity: 1 - progress * 0.3
+      });
+
+      // Angle Next Slide into perspective
+      if (activeTargetSlide) {
+        activeTargetSlide.style.zIndex = '20';
+        activeTargetSlide.style.pointerEvents = 'auto';
+        gsap.set(activeTargetSlide, {
+          xPercent: (1 - progress) * 100,
+          rotateY: -(1 - progress) * 18,
+          skewY: (1 - progress) * 3,
+          scale: 0.92 + progress * 0.08,
+          z: -(1 - progress) * 120,
+          opacity: progress
+        });
+      }
+    } else {
+      // Dragging right -> angled prev slide emerges from left
+      dragDirection = 'prev';
+      targetIdx = prevIdx;
+      activeTargetSlide = slides[prevIdx];
+
+      const progress = Math.min(1, Math.max(0, diffX / dragSensitivity));
+
+      // Angle Current Slide away
+      gsap.set(currentSlide, {
+        xPercent: progress * 70,
+        rotateY: -progress * 15,
+        skewY: progress * 3,
+        scale: 1 - progress * 0.08,
+        z: -progress * 100,
+        opacity: 1 - progress * 0.3
+      });
+
+      // Angle Prev Slide into perspective
+      if (activeTargetSlide) {
+        activeTargetSlide.style.zIndex = '20';
+        activeTargetSlide.style.pointerEvents = 'auto';
+        gsap.set(activeTargetSlide, {
+          xPercent: -(1 - progress) * 100,
+          rotateY: (1 - progress) * 18,
+          skewY: -(1 - progress) * 3,
+          scale: 0.92 + progress * 0.08,
+          z: -(1 - progress) * 120,
+          opacity: progress
+        });
+      }
+    }
+
+    // Step Progress Bar follows drag smoothly
+    const progressBar = document.getElementById('heroProgressBar');
+    if (progressBar) {
+      const baseLeft = heroCurrentIndex * 50;
+      const dragOffset = (-diffX / dragSensitivity) * 50;
+      const currentLeft = Math.max(0, Math.min(50, baseLeft + dragOffset));
+      gsap.to(progressBar, { left: currentLeft + '%', duration: 0.1, ease: 'none' });
+    }
+
+    gsap.to('#heroContentContainer', {
+      x: diffX * 0.05,
+      duration: 0.1,
+      ease: 'none'
+    });
+  }
+
+  function onDragEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    sliderSection.classList.remove('cursor-grabbing');
+
+    const diffX = currentX - startX;
+    const currentSlide = slides[heroCurrentIndex];
+
+    gsap.to('#heroContentContainer', {
+      x: 0,
+      duration: 0.4,
+      ease: 'power2.out'
+    });
+
+    const threshold = 55; // Gesture threshold
+
+    if (Math.abs(diffX) > threshold && activeTargetSlide && targetIdx !== heroCurrentIndex) {
+      // 3D Angle Snapping to completed plane
+      isAnimatingSlide = true;
+      triggerLiquidWave();
+      updateProgressBar(targetIdx, 0.75);
+
+      const outX = dragDirection === 'next' ? -100 : 100;
+      const outRotY = dragDirection === 'next' ? 18 : -18;
+      const outSkewY = dragDirection === 'next' ? -3 : 3;
+
+      gsap.to(currentSlide, {
+        xPercent: outX,
+        rotateY: outRotY,
+        skewY: outSkewY,
+        scale: 0.92,
+        z: -120,
+        opacity: 0,
+        duration: 0.75,
+        ease: 'power3.out'
+      });
+
+      gsap.to(activeTargetSlide, {
+        xPercent: 0,
+        rotateY: 0,
+        skewY: 0,
+        scale: 1.0,
+        z: 0,
+        opacity: 1,
+        duration: 0.75,
+        ease: 'power3.out',
+        onComplete: () => {
+          resetSlideLayers(targetIdx);
+          isAnimatingSlide = false;
+        }
+      });
+
+      updateTextAndDots(targetIdx, dragDirection);
+    } else {
+      // Snap back to original slide
+      gsap.to(currentSlide, {
+        xPercent: 0,
+        rotateY: 0,
+        skewY: 0,
+        scale: 1,
+        z: 0,
+        opacity: 1,
+        duration: 0.5,
+        ease: 'power3.out'
+      });
+
+      if (activeTargetSlide) {
+        const snapInX = dragDirection === 'next' ? 100 : -100;
+        const snapInRot = dragDirection === 'next' ? -18 : 18;
+        const snapInSkew = dragDirection === 'next' ? 3 : -3;
+
+        gsap.to(activeTargetSlide, {
+          xPercent: snapInX,
+          rotateY: snapInRot,
+          skewY: snapInSkew,
+          scale: 0.92,
+          z: -120,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power3.out',
+          onComplete: () => {
+            resetSlideLayers(heroCurrentIndex);
+          }
+        });
+      }
+
+      updateProgressBar(heroCurrentIndex, 0.45);
+    }
+
+    resetHeroTimer();
+  }
+
+  sliderSection.addEventListener('mousedown', onDragStart);
+  window.addEventListener('mousemove', onDragMove);
+  window.addEventListener('mouseup', onDragEnd);
+
+  sliderSection.addEventListener('touchstart', onDragStart, { passive: true });
+  window.addEventListener('touchmove', onDragMove, { passive: true });
+  window.addEventListener('touchend', onDragEnd);
+
+  dots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt(dot.getAttribute('data-index'));
+      const dir = idx > heroCurrentIndex ? 'next' : 'prev';
+      changeSlideAutoOrClick(idx, dir);
+      resetHeroTimer();
+    });
+  });
+
+  function startHeroTimer() {
+    heroSliderTimer = setInterval(() => {
+      const target = (heroCurrentIndex + 1) % slides.length;
+      changeSlideAutoOrClick(target, 'next');
+    }, 6500);
+  }
+
+  function resetHeroTimer() {
+    clearInterval(heroSliderTimer);
+    startHeroTimer();
+  }
+
+  startHeroTimer();
 }
+
+/* -------------------------------------------------------------
+ * 2. GSAP NAV LINK SVG BORDER TRACING ANIMATION
+ * ------------------------------------------------------------- */
+function initGSAPNavBorderHover() {
+  const navLinks = document.querySelectorAll('#mainNavMenu .nav-link');
+  if (!navLinks.length) return;
+
+  let activeLink = navLinks[0];
+
+  navLinks.forEach(link => {
+    const rect = link.querySelector('.nav-border-rect');
+    if (!rect) return;
+
+    let pathLength = 360;
+    try {
+      const measured = rect.getTotalLength();
+      if (measured && measured > 0) pathLength = measured;
+    } catch(e) {
+      pathLength = 360;
+    }
+
+    link.dataset.pathLength = pathLength;
+
+    gsap.set(rect, {
+      strokeDasharray: pathLength,
+      strokeDashoffset: pathLength
+    });
+
+    link.addEventListener('mouseenter', () => {
+      gsap.to(rect, {
+        strokeDashoffset: 0,
+        duration: 0.45,
+        ease: 'power3.out',
+        overwrite: 'auto'
+      });
+      gsap.to(link, {
+        color: '#FBBF24',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        duration: 0.25
+      });
+    });
+
+    link.addEventListener('mouseleave', () => {
+      const len = link.dataset.pathLength || 360;
+      gsap.to(rect, {
+        strokeDashoffset: len,
+        duration: 0.35,
+        ease: 'power2.in',
+        overwrite: 'auto'
+      });
+
+      if (link !== activeLink) {
+        gsap.to(link, {
+          color: 'rgba(255, 255, 255, 0.9)',
+          backgroundColor: 'transparent',
+          duration: 0.25
+        });
+      } else {
+        gsap.to(link, {
+          color: '#FBBF24',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          duration: 0.25
+        });
+      }
+    });
+
+    link.addEventListener('click', (e) => {
+      const targetHash = link.getAttribute('href');
+      if (targetHash && targetHash.startsWith('#')) {
+        const targetSection = document.querySelector(targetHash);
+        if (targetSection) {
+          e.preventDefault();
+          targetSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      if (activeLink && activeLink !== link) {
+        resetLink(activeLink);
+      }
+      activeLink = link;
+      setActiveLink(link);
+    });
+  });
+
+  function setActiveLink(link) {
+    if (!link) return;
+    link.classList.add('active-nav');
+    gsap.to(link, {
+      color: '#FBBF24',
+      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      duration: 0.3
+    });
+  }
+
+  function resetLink(link) {
+    if (!link) return;
+    const rect = link.querySelector('.nav-border-rect');
+    const len = link.dataset.pathLength || 360;
+
+    link.classList.remove('active-nav');
+    if (rect) {
+      gsap.to(rect, {
+        strokeDashoffset: len,
+        duration: 0.3,
+        ease: 'power2.in'
+      });
+    }
+
+    gsap.to(link, {
+      color: 'rgba(255, 255, 255, 0.9)',
+      backgroundColor: 'transparent',
+      duration: 0.3
+    });
+  }
+
+  setActiveLink(activeLink);
+}
+
+/* -------------------------------------------------------------
+ * 3. GSAP MAGNETIC BUTTON PHYSICS
+ * ------------------------------------------------------------- */
+function initGSAPMagneticButtons() {
+  const buttons = document.querySelectorAll('.magnetic-btn');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+
+      gsap.to(btn, {
+        x: x * 0.25,
+        y: y * 0.25,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, {
+        x: 0,
+        y: 0,
+        duration: 0.6,
+        ease: 'elastic.out(1, 0.3)'
+      });
+    });
+  });
+}
+
+/* -------------------------------------------------------------
+ * 4. EXECUTIVE LEADER PHOTO SLIDER & SCROLLTRIGGER COUNTER ANIMATIONS
+ * ------------------------------------------------------------- */
+const leadersData = [
+  {
+    badge: "CHAIRMAN & FOUNDER",
+    number: "01 / 03",
+    name: "Dr. Ahsan H. Mansur",
+    title: "Chairman, mCapital Ltd.",
+    bio: "Former Governor, Bangladesh Bank; 27-year IMF career in monetary policy and financial-sector reform.",
+    photo: "asset/Dr. Ahsan H. Mansur.jpg",
+    quote: "“Transparent financial stewardship and BSEC compliance are the cornerstone of diaspora wealth growth in Bangladesh.”"
+  },
+  {
+    badge: "BOARD GOVERNANCE",
+    number: "02 / 03",
+    name: "Mamun Rashid",
+    title: "Chairman, Financial Excellence Limited",
+    bio: "Former MD & Citi Country Officer, Citibank Bangladesh; former Managing Partner, PwC Bangladesh.",
+    photo: "asset/mamun.jpg",
+    quote: "“Institutional governance and rigorous due diligence protect every taka of non-resident Bangladeshi capital.”"
+  },
+  {
+    badge: "WORLD BANK ADVISORY",
+    number: "03 / 03",
+    name: "Zubaidur Rahman",
+    title: "Vice Chancellor, ZUMS",
+    bio: "15 years at the World Bank advising governments on financial transparency and governance.",
+    photo: "asset/zubaidur.jpg",
+    quote: "“Sovereign financial transparency creates lasting confidence across international investment syndicates.”"
+  }
+];
+
+let currentLeaderIdx = 0;
+
+function initLeaderSlider() {
+  const prevBtn = document.getElementById('prevLeaderBtn');
+  const nextBtn = document.getElementById('nextLeaderBtn');
+  const badgeEl = document.getElementById('leaderBadge');
+  const numEl = document.getElementById('leaderNumber');
+  const nameEl = document.getElementById('leaderName');
+  const titleEl = document.getElementById('leaderTitle');
+  const bioEl = document.getElementById('leaderBio');
+  const photoEl = document.getElementById('leaderPhoto');
+  const quoteEl = document.getElementById('leaderQuote');
+
+  if (!photoEl) return;
+
+  function updateLeaderShowcase(targetIdx, dir = 'next') {
+    currentLeaderIdx = targetIdx;
+    const data = leadersData[currentLeaderIdx];
+
+    gsap.to([photoEl, badgeEl, nameEl, titleEl, bioEl, quoteEl], {
+      opacity: 0,
+      x: dir === 'next' ? -20 : 20,
+      duration: 0.25,
+      ease: 'power2.in',
+      onComplete: () => {
+        if (badgeEl) badgeEl.innerText = data.badge;
+        if (numEl) numEl.innerText = data.number;
+        nameEl.innerText = data.name;
+        titleEl.innerText = data.title;
+        bioEl.innerText = data.bio;
+        photoEl.src = data.photo;
+        quoteEl.innerText = data.quote;
+
+        gsap.fromTo([photoEl, badgeEl, nameEl, titleEl, bioEl, quoteEl],
+          { opacity: 0, x: dir === 'next' ? 25 : -25 },
+          { opacity: 1, x: 0, duration: 0.45, stagger: 0.08, ease: 'power3.out' }
+        );
+      }
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      const targetIdx = (currentLeaderIdx - 1 + leadersData.length) % leadersData.length;
+      updateLeaderShowcase(targetIdx, 'prev');
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      const targetIdx = (currentLeaderIdx + 1) % leadersData.length;
+      updateLeaderShowcase(targetIdx, 'next');
+    });
+  }
+}
+
+function initActivitiesBentoAnimations() {
+  if (typeof ScrollTrigger === 'undefined') return;
+
+  const section = document.getElementById('ourActivitiesSection');
+  if (!section) return;
+
+  // Stagger entrance for header items
+  const header = document.getElementById('trustSectionHeader');
+  if (header) {
+    gsap.from(header.children, {
+      scrollTrigger: {
+        trigger: header,
+        start: 'top 80%',
+      },
+      opacity: 0,
+      y: 35,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: 'power3.out'
+    });
+  }
+
+  // Dynamic ScrollTrigger Counter Up Animations
+  const counter1 = document.getElementById('counter1');
+  const counter2 = document.getElementById('counter2');
+  const counter3 = document.getElementById('counter3');
+
+  if (counter1 && counter2 && counter3) {
+    let obj1 = { val: 0 };
+    let obj2 = { val: 0 };
+    let obj3 = { val: 0 };
+
+    ScrollTrigger.create({
+      trigger: '#ourActivitiesSection',
+      start: 'top 75%',
+      once: true,
+      onEnter: () => {
+        // Counter 1: $1B+
+        gsap.to(obj1, {
+          val: 1,
+          duration: 1.8,
+          ease: 'power2.out',
+          onUpdate: () => {
+            counter1.innerText = `$${Math.floor(obj1.val)}B+`;
+          }
+        });
+
+        // Counter 2: 30+
+        gsap.to(obj2, {
+          val: 30,
+          duration: 2.0,
+          ease: 'power2.out',
+          onUpdate: () => {
+            counter2.innerText = `${Math.floor(obj2.val)}+`;
+          }
+        });
+
+        // Counter 3: 12,000+
+        gsap.to(obj3, {
+          val: 12000,
+          duration: 2.2,
+          ease: 'power2.out',
+          onUpdate: () => {
+            counter3.innerText = `${Math.floor(obj3.val).toLocaleString()}+`;
+          }
+        });
+      }
+    });
+  }
+}
+
+/* -------------------------------------------------------------
+ * 5. WAYS TO INVEST SCROLLTRIGGER ENTRANCE ANIMATIONS
+ * ------------------------------------------------------------- */
+function initWaysToInvestAnimations() {
+  if (typeof ScrollTrigger === 'undefined') return;
+
+  const cards = document.querySelectorAll('#ways-to-invest .ways-card');
+  if (!cards.length) return;
+
+  gsap.fromTo(cards, 
+    { opacity: 0, y: 30 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      stagger: 0.15,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '#ways-to-invest',
+        start: 'top 85%',
+        toggleActions: 'play none none none'
+      }
+    }
+  );
+}
+
+/* -------------------------------------------------------------
+ * 6. WEALTH GOALS DISCOVERY ORGANIC FLOATING PHYSICS
+ * ------------------------------------------------------------- */
+function initGoalDiscoveryPhysics() {
+  const badges = [
+    document.getElementById('floatingBadge0'),
+    document.getElementById('floatingBadge1'),
+    document.getElementById('floatingBadge2')
+  ];
+
+  // Continuous organic levitation sine motion with individual phase offsets
+  badges.forEach((badge, idx) => {
+    if (!badge) return;
+    const dur = 3.2 + idx * 0.5;
+    const yOff = (idx % 2 === 0 ? -10 : 10);
+    const rot = (idx % 2 === 0 ? 2 : -2);
+
+    gsap.to(badge, {
+      y: yOff,
+      rotation: rot,
+      duration: dur,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+      delay: idx * 0.25
+    });
+  });
+
+  // Continuous subtle pulse on Thought Trail Dots
+  const dots = document.querySelectorAll('.thought-dot');
+  dots.forEach((dot, idx) => {
+    gsap.to(dot, {
+      y: -6,
+      scale: 1.15,
+      opacity: 0.85,
+      duration: 2.2 + idx * 0.3,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+      delay: idx * 0.2
+    });
+  });
+
+  // Mouse Gyro Parallax on Left Visual Stage
+  const visualStage = document.getElementById('goalVisualStage');
+  if (visualStage) {
+    visualStage.addEventListener('mousemove', (e) => {
+      const rect = visualStage.getBoundingClientRect();
+      const x = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+      const y = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+
+      badges.forEach((b, idx) => {
+        if (!b) return;
+        const depth = (idx + 1) * 7;
+        gsap.to(b, {
+          x: x * depth,
+          duration: 0.4,
+          ease: 'power1.out'
+        });
+      });
+    });
+
+    visualStage.addEventListener('mouseleave', () => {
+      badges.forEach((b) => {
+        if (!b) return;
+        gsap.to(b, { x: 0, duration: 0.6, ease: 'power2.out' });
+      });
+    });
+  }
+}
+
+/* -------------------------------------------------------------
+ * 7. GLOBAL KINETIC SCROLL REVEAL & SECTION HEADINGS ENGINE
+ * ------------------------------------------------------------- */
+function initGlobalScrollTypographyMotion() {
+  if (typeof ScrollTrigger === 'undefined') return;
+
+  const sections = ['#ourActivitiesSection', '#discover-goals', '#ways-to-invest', '#live-funds'];
+
+  sections.forEach((secSelector) => {
+    const sec = document.querySelector(secSelector);
+    if (!sec) return;
+
+    // Find headings & subtitles
+    const headings = sec.querySelectorAll('h2, .text-slate-600, #live-funds a');
+    
+    if (headings.length) {
+      gsap.fromTo(headings, 
+        { 
+          opacity: 0, 
+          y: 25 
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.75,
+          stagger: 0.12,
+          ease: 'power2.out',
+          clearProps: 'all',
+          scrollTrigger: {
+            trigger: sec,
+            start: 'top 88%',
+            toggleActions: 'play none none none',
+            once: true
+          }
+        }
+      );
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+ * 8. DUAL SOVEREIGN DEAL TOGGLE ENGINE (MANAGED FUNDS ⇋ DIRECT DEALS)
+ * ------------------------------------------------------------- */
+function initMonolithDealToggle() {
+  const toggleContainer = document.getElementById('monolithDealToggle');
+  if (!toggleContainer) return;
+
+  const buttons = toggleContainer.querySelectorAll('.monolith-mode-btn');
+  const monolithHeading = document.getElementById('monolithHeading');
+  const monolithSubHeading = document.getElementById('monolithSubHeading');
+  const monolithDeckLink = document.getElementById('monolithDeckLink');
+
+  // Deal Data Matrix
+  const dealsData = {
+    funds: {
+      heading: 'Open for Investment.',
+      subheading: 'Direct sovereign diaspora syndication into high-conviction Bangladesh growth sectors with audited institutional governance.',
+      link: 'https://mcb-mock.vercel.app/investors/funds',
+      linkText: 'View all fund opportunities',
+      items: [
+        {
+          bg: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop',
+          tag: '01 / MASTER FUND',
+          location: 'DHAKA · GLOBAL',
+          title: 'mCapital Bangladesh Diaspora Fund',
+          raised: '38%',
+          target: '$1B',
+          irr: '22.0%',
+          thesisTag: 'FUND THESIS & STRATEGY',
+          desc: 'Diaspora master fund allocating across Financial Services (60%), Distress Asset Recovery (30%) and Healthcare Impact (10%).',
+          min: '$5,000',
+          curtainTarget: '$1 Billion',
+          govTag: 'Governance',
+          govVal: 'BSEC Audited',
+          govValColor: 'text-emerald-400',
+          url: 'https://mcb-mock.vercel.app/opportunities/bangladesh-diaspora-fund'
+        },
+        {
+          bg: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1200&auto=format&fit=crop',
+          tag: '02 / SUB-FUND',
+          location: 'DHAKA, BD',
+          title: 'Distress Asset Recovery Fund',
+          raised: '31%',
+          target: '$600M',
+          irr: '21.0%',
+          thesisTag: 'FUND THESIS & STRATEGY',
+          desc: '$300M NRB fund alongside $300M institutional capital for recapitalisation and turnaround of viable distressed industrial assets.',
+          min: '$5,000',
+          curtainTarget: '$600 Million',
+          govTag: 'Tenor',
+          govVal: '4 – 6 Yrs Turnaround',
+          govValColor: 'text-white',
+          url: 'https://mcb-mock.vercel.app/opportunities/distress-asset-recovery-fund'
+        },
+        {
+          bg: 'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200&auto=format&fit=crop',
+          tag: '03 / SUB-FUND',
+          location: 'DHAKA, BD',
+          title: 'Healthcare Impact Fund',
+          raised: '55%',
+          target: '$100M',
+          irr: '16.8%',
+          thesisTag: 'FUND THESIS & STRATEGY',
+          desc: 'Hospitals, specialised tertiary care, diagnostics and digital health access infrastructure across Bangladesh.',
+          min: '$5,000',
+          curtainTarget: '$100 Million',
+          govTag: 'Impact Sector',
+          govVal: 'Tertiary Health',
+          govValColor: 'text-cyan-400',
+          url: 'https://mcb-mock.vercel.app/opportunities/healthcare-impact-fund'
+        }
+      ]
+    },
+    direct: {
+      heading: 'Direct Co-Investments.',
+      subheading: 'Institutional-grade direct private equity allocations into high-yield operating assets and market-leading enterprises.',
+      link: 'https://mcb-mock.vercel.app/investors/investments',
+      linkText: 'View all direct investments',
+      items: [
+        {
+          bg: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200&auto=format&fit=crop',
+          tag: '01 / DIRECT DEAL',
+          location: 'DHAKA, BD',
+          title: 'Nero Hospital, Dhaka',
+          raised: '40%',
+          target: '$10M',
+          irr: '17.0%',
+          thesisTag: 'DEAL HIGHLIGHTS & THESIS',
+          desc: 'Equity investment in a specialised private hospital expanding tertiary care capacity and advanced diagnostics in Dhaka.',
+          min: '$10,000',
+          curtainTarget: '$10 Million',
+          govTag: 'Asset Class',
+          govVal: 'Private Equity',
+          govValColor: 'text-amber-400',
+          url: 'https://mcb-mock.vercel.app/opportunities/nero-hospital-dhaka'
+        },
+        {
+          bg: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop',
+          tag: '02 / DIRECT DEAL',
+          location: 'DHAKA, BD',
+          title: 'Grameen Sukhee',
+          raised: '52%',
+          target: '$10M',
+          irr: '18.5%',
+          thesisTag: 'DEAL HIGHLIGHTS & THESIS',
+          desc: '30% equity stake in a technology-driven rural financial inclusion platform serving over 2.4M underserved communities.',
+          min: '$10,000',
+          curtainTarget: '$10 Million',
+          govTag: 'Asset Class',
+          govVal: 'Fintech Scale-Up',
+          govValColor: 'text-emerald-400',
+          url: 'https://mcb-mock.vercel.app/opportunities/grameen-sukhee'
+        },
+        {
+          bg: 'https://images.unsplash.com/photo-1497440001374-f26997328c1b?q=80&w=1200&auto=format&fit=crop',
+          tag: '03 / DIRECT DEAL',
+          location: 'RAJSHAHI, BD',
+          title: 'Sonali Solar Power',
+          raised: '34%',
+          target: '$25M',
+          irr: '15.5%',
+          thesisTag: 'DEAL HIGHLIGHTS & THESIS',
+          desc: 'Utility-scale solar project delivering clean energy to the national grid with 20-year sovereign power purchase agreements.',
+          min: '$10,000',
+          curtainTarget: '$25 Million',
+          govTag: 'Contract',
+          govVal: '20-Yr PPA Grid',
+          govValColor: 'text-gold-400',
+          url: 'https://mcb-mock.vercel.app/opportunities/sonali-solar-power'
+        }
+      ]
+    }
+  };
+
+  let currentMode = 'funds';
+
+  buttons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const targetMode = btn.getAttribute('data-mode');
+      if (targetMode === currentMode) return;
+
+      currentMode = targetMode;
+
+      // Update button active state
+      buttons.forEach((b) => {
+        b.classList.remove('active', 'bg-gold-600', 'text-white', 'shadow-xs');
+        b.classList.add('text-slate-300');
+      });
+      btn.classList.add('active', 'bg-gold-600', 'text-white', 'shadow-xs');
+      btn.classList.remove('text-slate-300');
+
+      const data = dealsData[currentMode];
+
+      // Smooth Thesis Fade
+      if (monolithHeading && monolithSubHeading) {
+        gsap.to([monolithHeading, monolithSubHeading], {
+          opacity: 0,
+          y: -10,
+          duration: 0.25,
+          onComplete: () => {
+            monolithHeading.textContent = data.heading;
+            monolithSubHeading.textContent = data.subheading;
+            if (monolithDeckLink) {
+              monolithDeckLink.setAttribute('href', data.link);
+              const textSpan = monolithDeckLink.querySelector('span');
+              if (textSpan) textSpan.textContent = data.linkText;
+            }
+            gsap.to([monolithHeading, monolithSubHeading], {
+              opacity: 1,
+              y: 0,
+              duration: 0.35,
+              ease: 'power2.out'
+            });
+          }
+        });
+      }
+
+      // Smooth Stage Crossfade for the 3 Panels
+      [0, 1, 2].forEach((idx) => {
+        const item = data.items[idx];
+        const stage = document.getElementById(`panelStage${idx}`);
+        if (!stage || !item) return;
+
+        gsap.to(stage, {
+          opacity: 0.35,
+          scale: 0.98,
+          duration: 0.22,
+          ease: 'power1.inOut',
+          onComplete: () => {
+            // Update Background
+            const bgEl = document.getElementById(`panelBg${idx}`);
+            if (bgEl) bgEl.style.backgroundImage = `url('${item.bg}')`;
+
+            // Update Top Bar
+            const tagEl = document.getElementById(`panelTag${idx}`);
+            if (tagEl) tagEl.textContent = item.tag;
+
+            const locEl = document.getElementById(`panelLocation${idx}`);
+            if (locEl) locEl.textContent = item.location;
+
+            // Update Resting Bottom
+            const titleEl = document.getElementById(`panelTitle${idx}`);
+            if (titleEl) titleEl.textContent = item.title;
+
+            const raisedEl = document.getElementById(`panelRaised${idx}`);
+            if (raisedEl) raisedEl.textContent = item.raised;
+
+            const targetEl = document.getElementById(`panelTarget${idx}`);
+            if (targetEl) targetEl.textContent = item.target;
+
+            const irrEl = document.getElementById(`panelIrr${idx}`);
+            if (irrEl) irrEl.textContent = item.irr;
+
+            // Update Rising Curtain Content
+            const thesisTagEl = document.getElementById(`panelThesisTag${idx}`);
+            if (thesisTagEl) thesisTagEl.textContent = item.thesisTag;
+
+            const curTitleEl = document.getElementById(`panelCurtainTitle${idx}`);
+            if (curTitleEl) curTitleEl.textContent = item.title;
+
+            const descEl = document.getElementById(`panelDesc${idx}`);
+            if (descEl) descEl.textContent = item.desc;
+
+            const minEl = document.getElementById(`panelMin${idx}`);
+            if (minEl) minEl.textContent = item.min;
+
+            const curIrrEl = document.getElementById(`panelCurtainIrr${idx}`);
+            if (curIrrEl) curIrrEl.textContent = item.irr;
+
+            const curTargetEl = document.getElementById(`panelCurtainTarget${idx}`);
+            if (curTargetEl) curTargetEl.textContent = item.curtainTarget;
+
+            const govTagEl = document.getElementById(`panelGovTag${idx}`);
+            if (govTagEl) govTagEl.textContent = item.govTag;
+
+            const govValEl = document.getElementById(`panelGovVal${idx}`);
+            if (govValEl) {
+              govValEl.textContent = item.govVal;
+              govValEl.className = `text-sm font-bold ${item.govValColor}`;
+            }
+
+            const btnEl = document.getElementById(`panelBtn${idx}`);
+            if (btnEl) btnEl.setAttribute('href', item.url);
+
+            // Animate Back In Smoothly
+            gsap.to(stage, {
+              opacity: 1,
+              scale: 1,
+              duration: 0.4,
+              delay: idx * 0.06,
+              ease: 'power2.out'
+            });
+          }
+        });
+      });
+    });
+  });
+}
+
+/* -------------------------------------------------------------
+ * 9. INTERACTIVE GLOBAL NRB HUBS MAP POWERED BY JSVECTORMAP
+ * ------------------------------------------------------------- */
+function initGlobalHubsMap() {
+  const mapContainer = document.getElementById('jvmWorldMap');
+  const tooltipCard = document.getElementById('hubTooltipCard');
+  if (!mapContainer) return;
+
+  const tooltipCity = document.getElementById('tooltipCity');
+  const tooltipCountry = document.getElementById('tooltipCountry');
+  const tooltipHost = document.getElementById('tooltipHost');
+  const tooltipInvestors = document.getElementById('tooltipInvestors');
+
+  // Hub Metadata Directory
+  const hubData = {
+    'Dhaka (Headquarters)': {
+      city: 'Global Headquarters',
+      country: 'Dhaka, Bangladesh',
+      host: 'Executive Board & Investment Committee',
+      investors: 'Sovereign Master Hub',
+      region: 'asia-pacific'
+    },
+    'London Hub': {
+      city: 'London Hub',
+      country: 'United Kingdom',
+      host: 'Dr. Farhan Ahmed (Founding NRB Host)',
+      investors: '1,840+ Diaspora Investors',
+      region: 'europe'
+    },
+    'New York Hub': {
+      city: 'New York Hub',
+      country: 'United States',
+      host: 'Tahmid Chowdhury (Managing Host)',
+      investors: '2,120+ Diaspora Investors',
+      region: 'north-america'
+    },
+    'Toronto Hub': {
+      city: 'Toronto Hub',
+      country: 'Canada',
+      host: 'Sabrina Karim (Host Coordinator)',
+      investors: '980+ Diaspora Investors',
+      region: 'north-america'
+    },
+    'Dubai Hub': {
+      city: 'Dubai Hub',
+      country: 'United Arab Emirates',
+      host: 'Engr. Shakil Hossain (Gulf Lead)',
+      investors: '3,450+ Diaspora Investors',
+      region: 'middle-east'
+    },
+    'Riyadh Hub': {
+      city: 'Riyadh Hub',
+      country: 'Saudi Arabia',
+      host: 'Kamal Uddin (Senior NRB Host)',
+      investors: '2,200+ Diaspora Investors',
+      region: 'middle-east'
+    },
+    'Doha Hub': {
+      city: 'Doha Hub',
+      country: 'Qatar',
+      host: 'Faisal Rahman (Regional Host)',
+      investors: '1,150+ Diaspora Investors',
+      region: 'middle-east'
+    },
+    'Singapore Hub': {
+      city: 'Singapore Hub',
+      country: 'Singapore',
+      host: 'Tanvir Anam (APAC Syndicate Host)',
+      investors: '860+ Diaspora Investors',
+      region: 'asia-pacific'
+    },
+    'Kuala Lumpur Hub': {
+      city: 'Kuala Lumpur Hub',
+      country: 'Malaysia',
+      host: 'Azim Mahmud (ASEAN Host)',
+      investors: '1,310+ Diaspora Investors',
+      region: 'asia-pacific'
+    },
+    'Sydney Hub': {
+      city: 'Sydney Hub',
+      country: 'Australia',
+      host: 'Nusrat Jahan (Oceania Host)',
+      investors: '740+ Diaspora Investors',
+      region: 'asia-pacific'
+    },
+    'Frankfurt Hub': {
+      city: 'Frankfurt Hub',
+      country: 'Germany',
+      host: 'Markus Hasan (EU Expansion Lead)',
+      investors: '620+ Diaspora Investors',
+      region: 'europe'
+    },
+    'Tokyo Hub': {
+      city: 'Tokyo Hub',
+      country: 'Japan',
+      host: 'Kenjiur Rahman (East Asia Host)',
+      investors: '490+ Diaspora Investors',
+      region: 'asia-pacific'
+    },
+    'Johannesburg Hub': {
+      city: 'Johannesburg Hub',
+      country: 'South Africa',
+      host: 'Aminul Islam (Africa Regional Host)',
+      investors: '380+ Diaspora Investors',
+      region: 'middle-east'
+    },
+    'Rome Hub': {
+      city: 'Rome & Milan Hub',
+      country: 'Italy',
+      host: 'Marco Alam (Southern EU Host)',
+      investors: '820+ Diaspora Investors',
+      region: 'europe'
+    }
+  };
+
+  const markers = [
+    { name: 'Dhaka (Headquarters)', coords: [23.8103, 90.4125], style: { fill: '#EF4444', stroke: '#FFFFFF', strokeWidth: 2.5, r: 8 } },
+    { name: 'London Hub', coords: [51.5074, -0.1278], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 2, r: 5.5 } },
+    { name: 'New York Hub', coords: [40.7128, -74.0060], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 2, r: 5.5 } },
+    { name: 'Toronto Hub', coords: [43.6532, -79.3832], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Dubai Hub', coords: [25.2048, 55.2708], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 2, r: 5.5 } },
+    { name: 'Riyadh Hub', coords: [24.7136, 46.6753], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Doha Hub', coords: [25.2854, 51.5310], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Singapore Hub', coords: [1.3521, 103.8198], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Kuala Lumpur Hub', coords: [3.1390, 101.6869], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Sydney Hub', coords: [-33.8688, 151.2093], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 2, r: 5.5 } },
+    { name: 'Frankfurt Hub', coords: [50.1109, 8.6821], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Tokyo Hub', coords: [35.6762, 139.6503], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Johannesburg Hub', coords: [-26.2041, 28.0473], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } },
+    { name: 'Rome Hub', coords: [41.9028, 12.4964], style: { fill: '#10B981', stroke: '#FFFFFF', strokeWidth: 1.8, r: 5 } }
+  ];
+
+  const lines = [
+    { from: 'Dhaka (Headquarters)', to: 'London Hub', style: { stroke: 'rgba(217, 119, 6, 0.85)', strokeWidth: 1.6, strokeDasharray: '4 4' } },
+    { from: 'Dhaka (Headquarters)', to: 'New York Hub', style: { stroke: 'rgba(16, 185, 129, 0.85)', strokeWidth: 1.6, strokeDasharray: '4 4' } },
+    { from: 'Dhaka (Headquarters)', to: 'Toronto Hub', style: { stroke: 'rgba(217, 119, 6, 0.75)', strokeWidth: 1.4, strokeDasharray: '4 4' } },
+    { from: 'Dhaka (Headquarters)', to: 'Dubai Hub', style: { stroke: 'rgba(217, 119, 6, 0.9)', strokeWidth: 2, strokeDasharray: '3 3' } },
+    { from: 'Dhaka (Headquarters)', to: 'Riyadh Hub', style: { stroke: 'rgba(217, 119, 6, 0.8)', strokeWidth: 1.6, strokeDasharray: '3 3' } },
+    { from: 'Dhaka (Headquarters)', to: 'Doha Hub', style: { stroke: 'rgba(217, 119, 6, 0.8)', strokeWidth: 1.6, strokeDasharray: '3 3' } },
+    { from: 'Dhaka (Headquarters)', to: 'Singapore Hub', style: { stroke: 'rgba(16, 185, 129, 0.85)', strokeWidth: 1.6, strokeDasharray: '3 3' } },
+    { from: 'Dhaka (Headquarters)', to: 'Kuala Lumpur Hub', style: { stroke: 'rgba(16, 185, 129, 0.85)', strokeWidth: 1.6, strokeDasharray: '3 3' } },
+    { from: 'Dhaka (Headquarters)', to: 'Sydney Hub', style: { stroke: 'rgba(16, 185, 129, 0.9)', strokeWidth: 1.8, strokeDasharray: '4 4' } },
+    { from: 'Dhaka (Headquarters)', to: 'Frankfurt Hub', style: { stroke: 'rgba(217, 119, 6, 0.8)', strokeWidth: 1.6, strokeDasharray: '4 4' } },
+    { from: 'Dhaka (Headquarters)', to: 'Tokyo Hub', style: { stroke: 'rgba(16, 185, 129, 0.8)', strokeWidth: 1.6, strokeDasharray: '3 3' } },
+    { from: 'Dhaka (Headquarters)', to: 'Johannesburg Hub', style: { stroke: 'rgba(217, 119, 6, 0.8)', strokeWidth: 1.6, strokeDasharray: '4 4' } },
+    { from: 'Dhaka (Headquarters)', to: 'Rome Hub', style: { stroke: 'rgba(217, 119, 6, 0.8)', strokeWidth: 1.6, strokeDasharray: '4 4' } }
+  ];
+
+  if (typeof jsVectorMap !== 'undefined') {
+    try {
+      const jvmMap = new jsVectorMap({
+        selector: '#jvmWorldMap',
+        map: 'world',
+        backgroundColor: 'transparent',
+        draggable: true,
+        zoomButtons: false,
+        zoomOnScroll: false,
+        regionStyle: {
+          initial: {
+            fill: '#083E3A',
+            fillOpacity: 1,
+            stroke: '#10B981',
+            strokeWidth: 0.8,
+            strokeOpacity: 0.9
+          },
+          hover: {
+            fill: '#0E5C56',
+            fillOpacity: 1,
+            stroke: '#34D399',
+            strokeWidth: 1.4,
+            cursor: 'pointer'
+          }
+        },
+        markers: markers,
+        lines: lines,
+        lineStyle: {
+          animation: true
+        },
+        markerTooltip: false,
+        onMarkerClick(event, index) {
+          const marker = markers[index];
+          if (!marker) return;
+          const data = hubData[marker.name];
+          if (data && tooltipCard) {
+            tooltipCity.textContent = data.city;
+            tooltipCountry.textContent = data.country;
+            tooltipHost.textContent = data.host;
+            tooltipInvestors.textContent = data.investors;
+          }
+        }
+      });
+
+      // Handle dynamic hover on SVG marker circles generated by jsVectorMap
+      setTimeout(() => {
+        const svgMarkers = mapContainer.querySelectorAll('.jvm-marker');
+        svgMarkers.forEach((svgM, idx) => {
+          const marker = markers[idx];
+          if (!marker) return;
+          const data = hubData[marker.name];
+          if (!data) return;
+
+          svgM.style.cursor = 'pointer';
+
+          svgM.addEventListener('mouseenter', (e) => {
+            if (!tooltipCard) return;
+            tooltipCity.textContent = data.city;
+            tooltipCountry.textContent = data.country;
+            tooltipHost.textContent = data.host;
+            tooltipInvestors.textContent = data.investors;
+
+            const rect = svgM.getBoundingClientRect();
+            const stageRect = mapContainer.getBoundingClientRect();
+
+            let leftPos = rect.left - stageRect.left + 15;
+            let topPos = rect.top - stageRect.top - 80;
+
+            if (leftPos + 260 > stageRect.width) {
+              leftPos = leftPos - 275;
+            }
+            if (topPos < 10) {
+              topPos = rect.top - stageRect.top + 20;
+            }
+
+            tooltipCard.style.left = `${leftPos}px`;
+            tooltipCard.style.top = `${topPos}px`;
+
+            gsap.to(tooltipCard, {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.25,
+              ease: 'power2.out',
+              overwrite: 'auto'
+            });
+          });
+
+          svgM.addEventListener('mouseleave', () => {
+            if (!tooltipCard) return;
+            gsap.to(tooltipCard, {
+              opacity: 0,
+              y: 4,
+              scale: 0.96,
+              duration: 0.2,
+              ease: 'power2.in',
+              overwrite: 'auto'
+            });
+          });
+        });
+      }, 500);
+
+      // Region Filter Chips Handler
+      const filterChips = document.querySelectorAll('#hubRegionFilters .hub-filter-chip');
+      filterChips.forEach((chip) => {
+        chip.addEventListener('click', () => {
+          const targetRegion = chip.getAttribute('data-region');
+
+          filterChips.forEach((c) => {
+            c.classList.remove('active', 'bg-gold-600', 'text-white', 'shadow-xs');
+            c.classList.add('bg-white/5', 'text-slate-300', 'border-white/10');
+          });
+          chip.classList.add('active', 'bg-gold-600', 'text-white', 'shadow-xs');
+          chip.classList.remove('bg-white/5', 'text-slate-300', 'border-white/10');
+
+          const svgMarkers = mapContainer.querySelectorAll('.jvm-marker');
+          svgMarkers.forEach((svgM, idx) => {
+            const marker = markers[idx];
+            if (!marker) return;
+            const data = hubData[marker.name];
+            if (!data) return;
+
+            if (targetRegion === 'all' || data.region === targetRegion || marker.name.includes('Dhaka')) {
+              gsap.to(svgM, {
+                opacity: 1,
+                scale: 1.25,
+                transformOrigin: 'center center',
+                duration: 0.35,
+                ease: 'back.out(2)',
+                onComplete: () => {
+                  gsap.to(svgM, { scale: 1, duration: 0.2 });
+                }
+              });
+            } else {
+              gsap.to(svgM, {
+                opacity: 0.15,
+                scale: 0.7,
+                transformOrigin: 'center center',
+                duration: 0.3,
+                ease: 'power2.out'
+              });
+            }
+          });
+        });
+      });
+
+    } catch (err) {
+      console.warn('jsVectorMap initialization:', err);
+    }
+  }
+}
+
+/* -------------------------------------------------------------
+ * 10. HOW IT WORKS — ARCHITECTURAL MONOLITH MOTION (GSAP)
+ * ------------------------------------------------------------- */
+function initWorkflowStepperScroll() {
+  const monolith = document.getElementById('howItWorksMonolith');
+  if (!monolith) return;
+
+  const panels = monolith.querySelectorAll('.how-it-works-panel');
+
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && panels.length) {
+    gsap.fromTo(
+      panels,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: monolith,
+          start: 'top 85%',
+          once: true
+        }
+      }
+    );
+  }
+}
+
+
 
 

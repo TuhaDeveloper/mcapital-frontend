@@ -1,78 +1,166 @@
-/* Custom UI Helper Styles supplementing Tailwind CSS */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
-.num-tabular {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+:root {
+  --primary-blue: #0066FF;
+  --primary-dark: #0A192F;
+  --accent-cyan: #06B6D4;
+  --accent-gold: #F59E0B;
 }
 
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* Modal Drawer Overlay Active State */
-.modal-overlay.active {
-  opacity: 1 !important;
-  pointer-events: auto !important;
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #F8FAFC;
+  color: #0F172A;
+  overflow-x: hidden;
 }
 
-/* Tab Filter Active State */
-.tab-link.active {
-  background-color: #0B1F3B !important;
-  color: #FFFFFF !important;
+h1, h2, h3, .font-heading {
+  font-family: 'Outfit', sans-serif;
 }
 
-/* Smooth Scroll Reveal Animations */
-.reveal-left {
-  opacity: 0;
-  transform: translateX(-50px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+/* Glassmorphism & Modern UI utilities */
+.glass-nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
-.reveal-right {
-  opacity: 0;
-  transform: translateX(50px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.05), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
 }
 
-.reveal-up {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+.glass-card-hover {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.reveal-zoom {
-  opacity: 0;
-  transform: scale(0.93);
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
+.glass-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -10px rgba(0, 102, 255, 0.15), 0 8px 20px -4px rgba(15, 23, 42, 0.08);
+  border-color: rgba(0, 102, 255, 0.4);
 }
 
-.reveal-active {
-  opacity: 1 !important;
-  transform: translate(0, 0) scale(1) !important;
-}
-
-/* Staggered Delay Utilities for Cascade Animations */
-.delay-100 { transition-delay: 100ms; }
-.delay-200 { transition-delay: 200ms; }
-.delay-300 { transition-delay: 300ms; }
-.delay-400 { transition-delay: 400ms; }
-.delay-500 { transition-delay: 500ms; }
-
-/* Refined Institutional Card Interaction */
-.eco-interactive-card {
+/* Dynamic SVG Border Navigation Link */
+.nav-item-wrapper {
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
 }
 
-.eco-interactive-card:hover {
-  transform: translateY(-8px);
+.nav-border-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
 }
 
+.nav-border-rect {
+  transition: stroke 0.3s ease;
+}
+
+/* Hero Radial Background Gradients */
+.hero-bg-glow {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1000px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(0, 102, 255, 0.12) 0%, rgba(6, 182, 212, 0.06) 40%, rgba(248, 250, 252, 0) 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-mesh-grid {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Custom CTA Shimmer & Pulse */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: translateX(-100%);
+}
+
+.btn-shimmer:hover::after {
+  animation: shimmer 1.2s infinite;
+}
+
+/* Custom Tab Pill Active Indicator */
+.segment-tab.active {
+  background-color: #0066FF;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.35);
+}
+
+/* Custom Card Selection Active State */
+.need-card.active {
+  border-color: #0066FF !important;
+  background: #FFFFFF;
+  box-shadow: 0 12px 32px -4px rgba(0, 102, 255, 0.18);
+  transform: translateY(-4px);
+}
+
+.need-card.active .card-icon-box {
+  background-color: #0066FF;
+  color: #FFFFFF;
+}
+
+/* Smooth SVG animation line */
+.border-path-draw {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+}
+
+/* Lenis Momentum & Inertia Smooth Scroll Standards */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Global Hub Flight Arc Pulse Animation */
+@keyframes dashFlight {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+.animated-flight-arc {
+  animation: dashFlight 2.4s linear infinite;
+}

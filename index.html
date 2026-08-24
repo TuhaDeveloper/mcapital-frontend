@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>mCapital | Institutional Funds &amp; Direct Private Equity in Bangladesh</title>
-  <meta name="description"
-    content="Curated, institution-grade Funds and Investments — backed by a global network of 100 hubs across 30 countries.">
-
+  <title>mCapital — The Premier Investment Platform in Bangladesh</title>
+  <meta name="description" content="Connecting millions of Non-Resident Bangladeshis with investment opportunities, business partnerships, and community across 30+ countries.">
+  
+  <!-- Google Fonts: Playfair Display for Luxury Serif Headlines + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- jsVectorMap CSS Library -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap/dist/css/jsvectormap.min.css" />
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -15,1043 +24,436 @@
       theme: {
         extend: {
           colors: {
-            brandNavy: '#0B1F3B',
-            brandDark: '#050E1A',
-            brandTeal: '#075C4C',
-            accentLime: '#A8F01D',
-            accentLimeHover: '#93D416',
-            brandGold: '#C5A028',
-            warmBg: '#FAF9F5'
+            midnight: {
+              DEFAULT: '#042F2E', // Deep Royal Forest Emerald
+              800: '#065F46',     // Rich Emerald
+              900: '#042F2E',     // Deepest Forest Emerald
+              950: '#022C22',     // Darkest Emerald Shadow
+            },
+            gold: {
+              400: '#FBBF24',
+              500: '#F59E0B',
+              600: '#D97706',     // Champagne Gold
+              700: '#B45309',
+            }
           },
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-            serif: ['Instrument Serif', 'Newsreader', 'serif']
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+            heading: ['Outfit', 'sans-serif'],
           }
         }
       }
     }
   </script>
 
-  <!-- Leaflet.js Map Library -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    /* Crisp SVG border overlay styling */
+    .nav-border-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .nav-border-rect {
+      transition: stroke 0.2s ease;
+    }
 
-  <!-- Google Fonts (Plus Jakarta Sans & Instrument Serif) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap"
-    rel="stylesheet">
+    /* Left-to-Right Fill Hover Animation for Buttons */
+    .btn-fill-left {
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      isolation: isolate;
+    }
+    .btn-fill-left::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0%;
+      height: 100%;
+      background-color: var(--fill-color, #D97706);
+      transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+      z-index: -1;
+      border-radius: inherit;
+    }
+    .btn-fill-left:hover::before {
+      width: 100%;
+    }
 
-  <!-- Custom Styles -->
-  <link rel="stylesheet" href="styles/main.css">
+    /* SVG Liquid Wave Distortion Filter Container */
+    .liquid-filter-active {
+      filter: url('#liquidWaveFilter');
+    }
+
+    /* 3D Skew & Angle Slider Perspective Stage */
+    .hero-3d-stage {
+      perspective: 1400px;
+      perspective-origin: 50% 50%;
+      transform-style: preserve-3d;
+    }
+
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .hero-slide-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.05);
+      will-change: transform;
+    }
+
+    /* Full-Wide Expanding Opportunity Flex Panels */
+    .opp-panel {
+      transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s ease;
+      will-change: flex, transform;
+    }
+    .opp-panel.active,
+    .opp-panel:hover {
+      flex: 2.8;
+    }
+    .opp-panel:not(.active):not(:hover) {
+      flex: 1;
+    }
+    
+    /* Reveal Expanded Body on Hover/Active */
+    .opp-panel .opp-details {
+      opacity: 0;
+      max-height: 0;
+      transform: translateY(15px);
+      transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.5s ease;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .opp-panel.active .opp-details,
+    .opp-panel:hover .opp-details {
+      opacity: 1;
+      max-height: 280px;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .opp-panel .opp-collapsed-label {
+      transition: opacity 0.3s ease;
+    }
+    .opp-panel.active .opp-collapsed-label,
+    .opp-panel:hover .opp-collapsed-label {
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
 </head>
+<body class="bg-white text-slate-800 antialiased selection:bg-amber-600 selection:text-white font-sans min-h-screen relative overflow-x-hidden">
 
-<body class="bg-warmBg text-slate-900 font-sans antialiased selection:bg-accentLime selection:text-black">
+  <!-- SVG LIQUID DISTORTION WAVE FILTER DEF -->
+  <svg class="hidden" aria-hidden="true">
+    <defs>
+      <filter id="liquidWaveFilter">
+        <feTurbulence type="fractalNoise" baseFrequency="0.02 0.05" numOctaves="2" result="noise" />
+        <feDisplacementMap id="liquidDisplacement" in="SourceGraphic" in2="noise" scale="0" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
 
-  <!-- ==================== STICKY FLOATING HEADER ==================== -->
-  <header
-    class="fixed top-0 inset-x-0 z-50 w-full py-4 px-6 md:px-12 transition-all duration-300 bg-transparent border-transparent"
-    id="siteHeader">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-
-      <!-- Transparent PNG Logo (Prominent Large Size) -->
-      <a href="#"
-        class="flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accentLime rounded-lg">
-        <img src="asset/logo.png" alt="mCapital Logo"
-          class="h-12 md:h-16 lg:h-18 w-auto object-contain filter drop-shadow-md group-hover:scale-105 transition-transform duration-300">
+  <!-- MAIN NAVIGATION HEADER (PURE TRANSPARENT OVERLAY NAVBAR) -->
+  <nav class="w-full absolute top-0 left-0 z-40 border-b border-white/10 transition-all duration-300" id="mainHeaderNav">
+    <div class="w-full px-6 sm:px-10 lg:px-16 h-20 flex items-center justify-between">
+      
+      <!-- LEFT SIDE: LOGO -->
+      <a href="#" class="flex items-center space-x-3 group" id="brandLogo">
+        <div class="w-9 h-9 rounded-xl bg-gold-600 text-white flex items-center justify-center font-black text-xl font-heading shadow-md shadow-gold-600/30 border border-gold-400/40 group-hover:scale-105 transition-transform duration-300">
+          m
+        </div>
+        <div class="flex flex-col">
+          <span class="font-heading font-extrabold text-2xl text-white tracking-tight leading-none group-hover:text-gold-400 transition-colors duration-300">mCapital</span>
+          <span class="text-[10px] font-bold text-gold-400 tracking-wider uppercase mt-0.5">Investment Platform</span>
+        </div>
       </a>
 
-      <!-- Center Nav Pills (Hidden on tablet, flex on XL) -->
-      <nav
-        class="hidden xl:flex items-center gap-2 bg-black/40 backdrop-blur-xl border border-white/10 p-1.5 rounded-full">
-
-        <!-- Home / Investments Dropdown Pill -->
+      <!-- CENTER: NAVIGATION LINKS WITH GSAP BORDER DRAWING & HOVER UX -->
+      <div class="hidden lg:flex items-center space-x-3" id="mainNavMenu">
+        
+        <!-- Nav Link 1: About Us (With Clean White Sub-menu, No Icons/Descriptions) -->
         <div class="relative group">
-          <button
-            class="flex items-center gap-1.5 bg-white text-slate-950 text-xs font-bold px-4 py-2 rounded-full transition-all shadow focus-visible:ring-2 focus-visible:ring-accentLime">
-            <span>Investments</span>
-            <svg class="w-3 h-3 group-hover:rotate-180 transition-transform duration-200" fill="none"
-              stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+          <a href="#about" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full" data-nav="about">
+            <svg class="nav-border-svg">
+              <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
             </svg>
-          </button>
+            <span class="relative z-10 flex items-center gap-1.5">
+              About Us
+              <i class="fa-solid fa-chevron-down text-[10px] text-white/60 group-hover:rotate-180 transition-transform duration-300"></i>
+            </span>
+          </a>
 
-          <!-- Dropdown Card -->
-          <div
-            class="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl p-2 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 border border-slate-100">
-            <a href="#opportunities"
-              class="block p-3 text-xs font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition">
-              Private Equity Funds
+          <!-- Dropdown Sub-menu: Pure White Background, High Contrast, Clean Links -->
+          <div class="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 translate-y-2 transition-all duration-200 z-50">
+            <a href="#overview" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-amber-50 hover:text-gold-600 transition-colors">
+              Company Overview
             </a>
-            <a href="#opportunities"
-              class="flex items-center justify-between p-3 text-xs font-bold bg-accentLime text-black rounded-xl hover:bg-accentLimeHover transition">
-              <span>Direct Co-Investments</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
+            <a href="#leadership" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-amber-50 hover:text-gold-600 transition-colors">
+              Leadership & Board
+            </a>
+            <a href="#philosophy" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-amber-50 hover:text-gold-600 transition-colors">
+              Investment Philosophy
+            </a>
+            <a href="#governance" class="block px-4 py-2.5 rounded-xl text-xs font-bold text-slate-800 hover:bg-amber-50 hover:text-gold-600 transition-colors">
+              Regulatory & Compliance
             </a>
           </div>
         </div>
 
-        <!-- Trust & Leadership Pill -->
-        <a href="#trust-leadership"
-          class="text-white/90 hover:text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/10 transition">
-          Who We Are
+        <!-- Nav Link 2: Opportunities -->
+        <a href="#opportunities" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full group" data-nav="opportunities">
+          <svg class="nav-border-svg">
+            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+          </svg>
+          <span class="relative z-10">Opportunities</span>
         </a>
 
-        <!-- Ecosystem Pill -->
-        <a href="#ecosystem"
-          class="text-white/90 hover:text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/10 transition">
-          One Ecosystem
+        <!-- Nav Link 3: Investor Relations -->
+        <a href="#investor-relations" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full group" data-nav="investor-relations">
+          <svg class="nav-border-svg">
+            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+          </svg>
+          <span class="relative z-10">Investor Relations</span>
         </a>
 
-        <!-- Opportunities Pill -->
-        <a href="#opportunities"
-          class="text-white/90 hover:text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/10 transition">
-          Opportunities
+        <!-- Nav Link 4: Impact -->
+        <a href="#impact" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full group" data-nav="impact">
+          <svg class="nav-border-svg">
+            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+          </svg>
+          <span class="relative z-10">Impact</span>
         </a>
 
-        <!-- Global Hubs Pill -->
-        <a href="#global-hubs"
-          class="text-white/90 hover:text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/10 transition">
-          NRB Global Hubs
+      </div>
+
+      <!-- RIGHT SIDE: SIGN IN BUTTON & START INVESTING CTA -->
+      <div class="flex items-center space-x-3">
+        <!-- Sign In Button -->
+        <a href="#signin" class="btn-fill-left px-5 py-2.5 rounded-full font-semibold text-sm text-white hover:text-midnight border border-white/20" style="--fill-color: #FFFFFF;">
+          Sign In
         </a>
 
-        <!-- How It Works Pill -->
-        <a href="#how-it-works"
-          class="text-white/90 hover:text-white text-xs font-semibold px-4 py-2 rounded-full hover:bg-white/10 transition">
-          How It Works
-        </a>
-      </nav>
-
-      <!-- Right Header Actions (Lime Accent Button) -->
-      <div class="flex items-center gap-3">
-        <!-- Contact Us / Open Account Lime Pill -->
-        <a href="#get-started"
-          class="bg-accentLime hover:bg-accentLimeHover text-slate-950 text-xs md:text-sm font-extrabold px-6 py-2.5 rounded-full transition-all duration-200 shadow-xl shadow-accentLime/20 flex items-center gap-2 focus-visible:ring-2 focus-visible:ring-accentLime">
-          <span>Open Account</span>
+        <!-- Primary Action Button: Start Investing -->
+        <a href="#start-investing" class="btn-fill-left px-6 py-2.5 rounded-full font-bold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/40 shadow-md shadow-gold-600/20" style="--fill-color: #042F2E;">
+          Start Investing
         </a>
       </div>
+
     </div>
-  </header>
+  </nav>
 
-  <!-- ==================== HERO SECTION WRAPPER ==================== -->
-  <div class="relative min-h-[90vh] bg-black flex flex-col justify-between overflow-hidden">
+  <!-- FULL-WIDTH HERO SLIDER (3D Skew / Angle Perspective Carousel Slider) -->
+  <section class="w-full min-h-[92vh] relative overflow-hidden flex items-center bg-black text-white cursor-grab active:cursor-grabbing select-none liquid-filter-active pt-20 hero-3d-stage" id="heroSliderSection">
+    
+    <!-- Slides Wrapper (3D Transformed Slides) -->
+    <div class="absolute inset-0 w-full h-full" id="heroSlidesWrapper" style="transform-style: preserve-3d;">
+      
+      <!-- Slide 1: Global Diaspora Capital (Skyline / Growth) -->
+      <div class="hero-slide active" data-slide="0">
+        <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop');"></div>
+        <!-- PURE NEUTRAL BLACK GRADIENT OVERLAY -->
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20"></div>
+      </div>
 
-    <!-- Full-Bleed Background Image with Enhanced Dark Color Overlay for 100% Text Readability -->
-    <div class="absolute inset-0 z-0">
-      <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1920&q=80"
-        alt="Executive investment partnership meeting"
-        class="w-full h-full object-cover filter brightness-[0.45] contrast-[1.1]">
-      <div class="absolute inset-0 bg-gradient-to-b from-black/90 via-black/75 to-black/95"></div>
+      <!-- Slide 2: Institutional Governance & Wealth Growth (Executive Financial Dealmaking) -->
+      <div class="hero-slide opacity-0 pointer-events-none" data-slide="1">
+        <div class="hero-slide-bg" style="background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2000&auto=format&fit=crop');"></div>
+        <!-- PURE NEUTRAL BLACK GRADIENT OVERLAY -->
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20"></div>
+      </div>
+
     </div>
 
-    <!-- ==================== HERO MAIN CONTENT ==================== -->
-    <main class="relative z-10 max-w-7xl mx-auto px-6 md:px-12 my-auto py-20 w-full">
-      <div class="max-w-3xl">
+    <!-- Overlaid Hero Content & Dynamic Text -->
+    <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 py-20 relative z-30 pointer-events-none" style="transform: translateZ(40px);">
+      <div class="max-w-4xl space-y-6 pointer-events-auto" id="heroContentContainer">
+        
+        <!-- Pre-Headline (CSS tracking-[0.35em] for persistent wide letter spacing) -->
+        <div class="text-xs text-gold-400 font-extrabold uppercase tracking-[0.35em]" id="heroPreTitle">
+          YOUR PARTNER FOR GROWTH
+        </div>
 
-        <!-- Editorial Headline with High-Contrast Serif Italics -->
-        <h1
-          class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white tracking-tight leading-tight md:leading-[1.08] mb-6 drop-shadow-lg">
-          Invest in the future of Bangladesh,
-          <span class="text-accentLime underline decoration-accentLime/40 underline-offset-8">from
-            anywhere in the world.</span>
+        <!-- Main Headline -->
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-serif font-extrabold text-white leading-tight tracking-tight drop-shadow-md" id="heroSlideTitle">
+          Connecting millions of Non-Resident Bangladeshis.
         </h1>
 
-        <!-- Hero Subtitle with High Readability Contrast -->
-        <p class="text-base md:text-xl text-slate-200 font-normal leading-relaxed mb-10 max-w-2xl drop-shadow-md">
-          Curated, institution-grade Funds and Private Equity — backed by a global advisory network of 100 hubs across
-          30 countries.
+        <!-- Slide Subtitle -->
+        <p class="text-slate-200 text-lg sm:text-xl max-w-2xl leading-relaxed font-normal font-sans drop-shadow-sm" id="heroSlideDesc">
+          Investing Together to Build Better Bangladesh.
         </p>
 
-        <!-- CTA Buttons (Lime Pill + Separate Circular Arrow Button) -->
-        <div class="flex items-center gap-3 mb-10">
-          <a href="#opportunities"
-            class="bg-accentLime hover:bg-accentLimeHover text-slate-950 font-extrabold text-sm md:text-base px-8 py-4 rounded-full transition-all shadow-2xl shadow-accentLime/30 flex items-center justify-center">
+        <!-- CTA Button: [ + ] Learn More & Explore Opportunities -->
+        <div class="pt-4 flex flex-wrap items-center gap-6">
+          <a href="#start-investing" class="inline-flex items-center gap-3 group">
+            <span class="w-10 h-10 bg-gold-600 group-hover:bg-gold-500 text-white flex items-center justify-center font-bold text-lg rounded-md shadow-md transition-colors">
+              +
+            </span>
+            <span class="font-bold text-white text-base tracking-wide group-hover:text-gold-400 transition-colors drop-shadow-sm">
+              Learn More
+            </span>
+          </a>
+          
+          <a href="#opportunities" class="btn-fill-left px-6 py-3 bg-white/10 hover:text-white text-white font-bold text-sm rounded-full backdrop-blur-md border border-white/20 transition-all duration-300" style="--fill-color: #D97706;">
             Explore Opportunities
           </a>
-          <a href="#opportunities"
-            class="w-12 h-12 md:w-14 md:h-14 rounded-full bg-accentLime hover:bg-accentLimeHover text-slate-950 flex items-center justify-center transition-all shadow-2xl shadow-accentLime/30"
-            aria-label="Explore Opportunities Arrow">
-            <svg class="w-6 h-6 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-            </svg>
-          </a>
         </div>
 
-        <!-- Trust Highlights Pill Row -->
-        <div
-          class="flex flex-wrap items-center gap-4 md:gap-8 text-xs md:text-sm font-semibold text-slate-200 border-t border-white/15 pt-6">
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-            Regulated custody
-          </span>
-          <span class="text-white/30">•</span>
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-            Transparent reporting
-          </span>
-          <span class="text-white/30">•</span>
-          <span class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-            Global access
-          </span>
-        </div>
-      </div>
-    </main>
-
-    <!-- ==================== BOTTOM FLOATING HORIZONTAL TAB BAR ==================== -->
-    <div class="relative z-20 pb-8 px-6 md:px-12 w-full">
-      <div class="max-w-7xl mx-auto">
-        <div
-          class="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 p-2 bg-black/50 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-full">
-
-          <!-- Active White Tab Pill -->
-          <a href="#trust-leadership"
-            class="hero-tab-pill flex items-center justify-center py-3.5 px-6 rounded-xl md:rounded-full bg-white text-slate-950 shadow-lg hover:bg-slate-100 transition">
-            <span class="text-xs font-black tracking-widest uppercase">GOVERNANCE &amp; TRUST</span>
-          </a>
-
-          <!-- Translucent Glass Tab Pill 2 -->
-          <a href="#ecosystem"
-            class="hero-tab-pill flex items-center justify-center py-3.5 px-6 rounded-xl md:rounded-full bg-white/10 text-white/90 hover:bg-white/20 transition">
-            <span class="text-xs font-bold tracking-widest uppercase">CAPITAL ECOSYSTEM</span>
-          </a>
-
-          <!-- Translucent Glass Tab Pill 3 -->
-          <a href="#opportunities"
-            class="hero-tab-pill flex items-center justify-center py-3.5 px-6 rounded-xl md:rounded-full bg-white/10 text-white/90 hover:bg-white/20 transition">
-            <span class="text-xs font-bold tracking-widest uppercase">INVESTMENT OPPORTUNITIES</span>
-          </a>
-        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ==================== HUMAN-DESIGNED INSTITUTIONAL METRICS BAR ==================== -->
-  <section class="py-16 md:py-20 bg-[#FAF9F5] border-b border-slate-200/80">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
+    <!-- Bottom Timeline Step Segment Bar & Dots -->
+    <div class="absolute bottom-0 left-0 w-full z-30 px-6 sm:px-10 lg:px-16 pb-6 pt-4 bg-gradient-to-t from-black/80 to-transparent" style="transform: translateZ(30px);">
+      
+      <!-- Horizontal Segment Line (50% Sliding Step Indicator) -->
+      <div class="w-full bg-white/20 h-1 rounded-full overflow-hidden mb-4 relative">
+        <div class="bg-gold-500 h-full w-1/2 absolute top-0 left-0 transition-all duration-500 ease-out rounded-full" id="heroProgressBar"></div>
+      </div>
 
-      <!-- Clean Editorial Stat Strip with Fine Hairline Dividers (No nested gray boxes or AI dots) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-0 lg:divide-x divide-slate-200/90">
-
-        <!-- Stat 1 -->
-        <div class="lg:pr-8 reveal-up delay-100">
-          <span class="text-[11px] font-black text-brandTeal uppercase tracking-widest block mb-2">CAPITAL POOL</span>
-          <span
-            class="stat-counter text-4xl md:text-5xl font-extrabold text-brandNavy tracking-tight num-tabular block mb-2"
-            data-target="1.47" data-prefix="$" data-suffix="B" data-decimals="2">$1.47B</span>
-          <span class="text-xs font-bold text-slate-800 block">Assets under management</span>
+      <div class="flex items-center justify-end">
+        <!-- Hero Slider Dots (2 Dots) -->
+        <div class="flex items-center space-x-2" id="heroSliderDots">
+          <button class="w-3 h-3 rounded-full bg-gold-500 transition-all hero-dot active" data-index="0"></button>
+          <button class="w-3 h-3 rounded-full bg-white/40 transition-all hero-dot" data-index="1"></button>
         </div>
-
-        <!-- Stat 2 -->
-        <div class="lg:px-8 reveal-up delay-200">
-          <span class="text-[11px] font-black text-brandTeal uppercase tracking-widest block mb-2">INVESTOR
-            NETWORK</span>
-          <span
-            class="stat-counter text-4xl md:text-5xl font-extrabold text-brandNavy tracking-tight num-tabular block mb-2"
-            data-target="12000" data-suffix="+" data-format="comma">12,000+</span>
-          <span class="text-xs font-bold text-slate-800 block">NRB accredited investors</span>
-        </div>
-
-        <!-- Stat 3 -->
-        <div class="lg:px-8 reveal-up delay-300">
-          <span class="text-[11px] font-black text-brandTeal uppercase tracking-widest block mb-2">GLOBAL REACH</span>
-          <span
-            class="stat-counter text-4xl md:text-5xl font-extrabold text-brandNavy tracking-tight num-tabular block mb-2"
-            data-target="30">30</span>
-          <span class="text-xs font-bold text-slate-800 block">Countries served</span>
-        </div>
-
-        <!-- Stat 4 -->
-        <div class="lg:pl-8 reveal-up delay-400">
-          <span class="text-[11px] font-black text-brandTeal uppercase tracking-widest block mb-2">PROVEN YIELD</span>
-          <span
-            class="stat-counter text-4xl md:text-5xl font-extrabold text-brandTeal tracking-tight num-tabular block mb-2"
-            data-target="24.5" data-suffix="%" data-decimals="1">24.5%</span>
-          <span class="text-xs font-bold text-slate-800 block">Average Net IRR (Weighted)</span>
-        </div>
-
       </div>
 
     </div>
+
   </section>
 
-  <!-- ==================== SECOND SECTION: TRUST & LEADERSHIP ==================== -->
-  <section class="py-20 md:py-28 bg-white border-b border-slate-200" id="trust-leadership">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-
-      <!-- Executive 2-Column Split Section Header -->
-      <div
-        class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end mb-16 pb-8 border-b border-slate-200/80 reveal-up">
-        <div class="lg:col-span-7">
-          <div
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brandTeal/10 border border-brandTeal/20 text-brandTeal text-xs font-mono font-bold tracking-widest uppercase mb-4">
-            <span class="w-1.5 h-1.5 rounded-full bg-brandTeal"></span>
-            WHO WE ARE &amp; GOVERNANCE
-          </div>
-          <h2 class="text-3xl md:text-5xl font-extrabold text-brandNavy tracking-tight leading-tight">
-            The Experience &amp; Integrity <span class="text-brandTeal">Behind Every
-              Allocation</span>
+  <!-- 2ND SECTION: HUMAN FRAMELESS EDITORIAL LAYOUT (ROYAL EMERALD & CHAMPAGNE GOLD ACCENTS) -->
+  <section class="w-full py-28 bg-white text-slate-800 relative overflow-hidden border-t border-slate-100" id="ourActivitiesSection">
+    <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 space-y-12 sm:space-y-14">
+      
+      <!-- TOP ROW: ARCHITECTURAL EDITORIAL HEADER + FRAMELESS METRICS (VERTICALLY CENTERED) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center" id="trustSectionHeader">
+        
+        <!-- Left Side: Title & Subheading -->
+        <div class="lg:col-span-6 space-y-4">
+          <h2 class="text-4xl sm:text-5xl font-serif font-extrabold text-midnight leading-tight tracking-tight">
+            Institutional Leadership Behind Diaspora Wealth
           </h2>
-        </div>
-        <div class="lg:col-span-5 border-l-2 border-brandTeal/30 pl-6 lg:pl-8 py-1">
-          <p class="text-slate-600 text-base md:text-lg font-medium leading-relaxed">
-            Guided by international economists, private equity stewards, and legal specialists committed to
-            institutional
-            transparency.
-          </p>
-        </div>
-      </div>
-
-      <!-- 3-Card Layout matching Reference Photo -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-
-        <!-- Card 1: Who We Are -->
-        <div
-          class="reveal-left delay-100 bg-slate-100/80 p-8 rounded-[2.2rem] border border-slate-200/60 flex flex-col justify-between min-h-[460px] group hover:shadow-xl transition-all duration-300">
-          <div>
-            <div class="flex items-center justify-between mb-6">
-              <span
-                class="bg-white/80 backdrop-blur-md text-slate-700 text-xs font-bold px-4 py-1.5 rounded-full border border-slate-200/80 uppercase tracking-wider">
-                WHO WE ARE
-              </span>
-              <div
-                class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-900 shadow-sm group-hover:bg-brandNavy group-hover:text-white transition-colors duration-300">
-                <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
-              </div>
-            </div>
-
-            <h3 class="text-2xl font-extrabold text-brandNavy leading-snug mb-6">
-              Leading Provider of Institutional Investments &amp; Private Equity
-            </h3>
-          </div>
-
-          <div class="rounded-2xl overflow-hidden h-48 border border-slate-200/80 shadow-inner">
-            <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&q=80"
-              alt="Executive team strategy meeting"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-          </div>
-        </div>
-
-        <!-- Card 2: Featured Electric Lime Card -->
-        <div
-          class="reveal-up delay-200 bg-accentLime p-8 rounded-[2.2rem] flex flex-col justify-between min-h-[460px] shadow-2xl shadow-accentLime/20 relative overflow-hidden group hover:bg-accentLimeHover transition-all duration-300">
-
-          <!-- Decorative Logo Overlay -->
-          <div class="absolute -right-12 -top-12 opacity-10 pointer-events-none">
-            <img src="asset/logo.jpg" alt="" class="w-72 h-72 object-contain">
-          </div>
-
-          <div class="relative z-10">
-            <div class="flex items-center justify-between mb-6">
-              <span
-                class="bg-black/10 text-slate-950 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-                RECOGNITION &amp; GOVERNANCE
-              </span>
-            </div>
-
-            <h3 class="text-3xl font-extrabold text-slate-950 leading-snug mt-12 mb-6">
-              Governed by World-Class Economists &amp; Private Equity Veterans
-            </h3>
-          </div>
-
-          <div class="relative z-10 flex items-center justify-between pt-6 border-t border-black/10">
-            <span class="text-xs font-black uppercase text-slate-900 tracking-wider">100 Hubs Across 30 Countries</span>
-            <div
-              class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-slate-950 shadow-lg group-hover:scale-110 transition-transform duration-300">
-              <svg class="w-5 h-5 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3: Dr. Ahsan H. Mansur Leadership Card -->
-        <div
-          class="reveal-right delay-300 bg-slate-100/80 p-8 rounded-[2.2rem] border border-slate-200/60 flex flex-col justify-between min-h-[460px] group hover:shadow-xl transition-all duration-300">
-          <div>
-            <div class="flex items-center justify-between mb-6">
-              <span
-                class="bg-white/80 backdrop-blur-md text-slate-700 text-xs font-bold px-4 py-1.5 rounded-full border border-slate-200/80 uppercase tracking-wider">
-                LEADERSHIP &amp; ADVISORY
-              </span>
-              <div
-                class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-900 shadow-sm group-hover:bg-brandNavy group-hover:text-white transition-colors duration-300">
-                <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
-              </div>
-            </div>
-
-            <h3 class="text-2xl font-extrabold text-brandNavy leading-snug mb-1">
-              Dr. Ahsan H. Mansur
-            </h3>
-            <span class="text-xs font-bold text-brandTeal uppercase block mb-4">Economic Governance &amp;
-              Oversight</span>
-          </div>
-
-          <div class="rounded-2xl overflow-hidden h-52 border border-slate-200/80 shadow-md relative">
-            <img src="asset/Dr. Ahsan H. Mansur.jpg" alt="Dr. Ahsan H. Mansur"
-              class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent p-3">
-              <span class="text-white text-xs font-semibold block">Governor &amp; Senior Advisor</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== SECTION 02: ECOSYSTEM (HIGH-END INSTITUTIONAL ANIMATION) ==================== -->
-  <section class="py-20 md:py-28 bg-[#FAF9F5] border-b border-slate-200/80" id="ecosystem">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-
-      <!-- Modern Asymmetrical Section Header -->
-      <div class="mb-16 reveal-up">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-8 h-1 bg-brandTeal rounded-full"></div>
-          <span class="text-xs font-mono font-bold tracking-widest text-brandTeal uppercase">PLATFORM
-            PARTICIPANTS</span>
-        </div>
-        <h2 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-brandNavy tracking-tight leading-tight mb-4">
-          Built for everyone in <span class="text-brandTeal">the capital journey</span>
-        </h2>
-        <p class="text-slate-600 text-base md:text-lg font-medium leading-relaxed max-w-2xl">
-          mCapital brings together investors, sponsors, managers, and local hosts under a single, transparent, and
-          compliant platform.
-        </p>
-      </div>
-
-      <!-- 4 Role Cards Grid with Staggered Cascading Entrance & Micro-Interactions -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-
-        <!-- Role 1 -->
-        <div
-          class="reveal-up delay-100 eco-interactive-card bg-white p-8 md:p-9 rounded-[2.2rem] border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-brandTeal/60 transition-all duration-400 flex flex-col justify-between group overflow-hidden">
-          <div>
-            <!-- Smooth Expanding Top Accent Line -->
-            <div
-              class="w-10 h-1 bg-slate-200 group-hover:w-full group-hover:bg-brandTeal transition-all duration-500 rounded-full mb-6">
-            </div>
-
-            <div class="flex items-start justify-between gap-3 mb-3">
-              <h3
-                class="text-xl font-extrabold text-brandNavy leading-snug group-hover:text-brandTeal transition-colors">
-                NRB Investor / mCapital Member
-              </h3>
-              <svg
-                class="w-5 h-5 text-slate-300 group-hover:text-brandTeal group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300 shrink-0 mt-0.5"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </div>
-
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Non-Resident Bangladeshi investors who invest across both Funds and individual Investments.
-            </p>
-          </div>
-        </div>
-
-        <!-- Role 2 -->
-        <div
-          class="reveal-up delay-200 eco-interactive-card bg-white p-8 md:p-9 rounded-[2.2rem] border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-brandTeal/60 transition-all duration-400 flex flex-col justify-between group overflow-hidden">
-          <div>
-            <!-- Smooth Expanding Top Accent Line -->
-            <div
-              class="w-10 h-1 bg-slate-200 group-hover:w-full group-hover:bg-brandTeal transition-all duration-500 rounded-full mb-6">
-            </div>
-
-            <div class="flex items-start justify-between gap-3 mb-3">
-              <h3
-                class="text-xl font-extrabold text-brandNavy leading-snug group-hover:text-brandTeal transition-colors">
-                Investment Sponsor
-              </h3>
-              <svg
-                class="w-5 h-5 text-slate-300 group-hover:text-brandTeal group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300 shrink-0 mt-0.5"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </div>
-
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Sponsors who propose and champion Investments for funding on the platform.
-            </p>
-          </div>
-        </div>
-
-        <!-- Role 3 -->
-        <div
-          class="reveal-up delay-300 eco-interactive-card bg-white p-8 md:p-9 rounded-[2.2rem] border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-brandTeal/60 transition-all duration-400 flex flex-col justify-between group overflow-hidden">
-          <div>
-            <!-- Smooth Expanding Top Accent Line -->
-            <div
-              class="w-10 h-1 bg-slate-200 group-hover:w-full group-hover:bg-brandTeal transition-all duration-500 rounded-full mb-6">
-            </div>
-
-            <div class="flex items-start justify-between gap-3 mb-3">
-              <h3
-                class="text-xl font-extrabold text-brandNavy leading-snug group-hover:text-brandTeal transition-colors">
-                Fund Manager
-              </h3>
-              <svg
-                class="w-5 h-5 text-slate-300 group-hover:text-brandTeal group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300 shrink-0 mt-0.5"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </div>
-
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Professionals who structure and manage Funds, overseeing capital calls and distributions.
-            </p>
-          </div>
-        </div>
-
-        <!-- Role 4 -->
-        <div
-          class="reveal-up delay-400 eco-interactive-card bg-white p-8 md:p-9 rounded-[2.2rem] border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-brandTeal/60 transition-all duration-400 flex flex-col justify-between group overflow-hidden">
-          <div>
-            <!-- Smooth Expanding Top Accent Line -->
-            <div
-              class="w-10 h-1 bg-slate-200 group-hover:w-full group-hover:bg-brandTeal transition-all duration-500 rounded-full mb-6">
-            </div>
-
-            <div class="flex items-start justify-between gap-3 mb-3">
-              <h3
-                class="text-xl font-extrabold text-brandNavy leading-snug group-hover:text-brandTeal transition-colors">
-                NRB Host
-              </h3>
-              <svg
-                class="w-5 h-5 text-slate-300 group-hover:text-brandTeal group-hover:translate-x-1 group-hover:-translate-y-1 transition-all duration-300 shrink-0 mt-0.5"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </div>
-
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Local hosts operating our network of 100 global hubs across 30 countries.
-            </p>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ==================== SECTION 03: IMAGE-BASED CATEGORY GATEWAY MARKETPLACE ==================== -->
-  <section class="py-20 md:py-28 bg-[#FAF9F5] border-b border-slate-200/80" id="opportunities">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-
-      <!-- Architectural 2-Column Split Section Header -->
-      <div
-        class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end mb-16 pb-8 border-b border-slate-200/80 reveal-up">
-        <div class="lg:col-span-7">
-          <div
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brandTeal/10 border border-brandTeal/20 text-brandTeal text-xs font-mono font-bold tracking-widest uppercase mb-4">
-            <span class="w-1.5 h-1.5 rounded-full bg-brandTeal"></span>
-            INVESTMENT CATEGORIES
-          </div>
-          <h2 class="text-3xl md:text-5xl font-extrabold text-brandNavy tracking-tight leading-tight">
-            One trusted platform. <span class="text-brandTeal">Two ways to invest.</span>
-          </h2>
-        </div>
-        <div class="lg:col-span-5 border-l-2 border-brandTeal/30 pl-6 lg:pl-8 py-1">
-          <p class="text-slate-700 text-base md:text-lg font-medium leading-relaxed">
-            Managed Funds or direct Investments — with institutional-grade transparency and governance either way.
-          </p>
-        </div>
-      </div>
-
-      <!-- 2 IMAGE-BASED CATEGORY GATEWAY CARDS (AUTHENTIC BRAND COLORS) -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-        <!-- CARD 1: INVEST IN MANAGED FUNDS (IMAGE BASE WITH DARK GRADIENT OVERLAY) -->
-        <div
-          class="reveal-left relative rounded-[2.5rem] overflow-hidden min-h-[560px] flex flex-col justify-between p-8 md:p-12 shadow-2xl group border border-white/10 bg-black">
-
-          <!-- Background Image -->
-          <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=1200&q=80"
-              alt="Invest in managed Funds"
-              class="w-full h-full object-cover filter brightness-[0.55] group-hover:scale-105 transition-transform duration-700">
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/40"></div>
-          </div>
-
-          <!-- Top Navigation Pill Bar -->
-          <div class="relative z-10 flex items-center justify-between">
-            <span
-              class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white text-xs font-extrabold px-4 py-2 rounded-full border border-white/20 uppercase tracking-wider">
-              <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              FUNDS
-            </span>
-
-            <button
-              class="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:bg-accentLime group-hover:text-slate-950 transition-all shadow-lg">
-              <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Bottom Editorial Content Box -->
-          <div class="relative z-10 mt-auto pt-20">
-            <h3 class="text-3xl md:text-5xl text-white font-extrabold leading-tight mb-4">
-              Invest in managed Funds
-            </h3>
-
-            <p class="text-slate-200 text-sm md:text-base leading-relaxed mb-8 font-normal max-w-xl">
-              Diversified, professionally managed portfolios across sectors and geographies — tracked from a single
-              dashboard.
-            </p>
-
-            <!-- Floating Translucent Metric Strip -->
-            <div
-              class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 p-4 md:p-5 grid grid-cols-3 gap-2 mb-6 text-center">
-              <div>
-                <span class="block text-xl md:text-2xl font-extrabold text-accentLime num-tabular">24.5%</span>
-                <span class="block text-[11px] text-slate-300 font-bold uppercase mt-1">Avg. IRR</span>
-              </div>
-              <div class="border-x border-white/15">
-                <span class="block text-xl md:text-2xl font-extrabold text-white num-tabular">1.38x</span>
-                <span class="block text-[11px] text-slate-300 font-bold uppercase mt-1">Net MOIC</span>
-              </div>
-              <div>
-                <span class="block text-xl md:text-2xl font-extrabold text-white num-tabular">12</span>
-                <span class="block text-[11px] text-slate-300 font-bold uppercase mt-1">Active funds</span>
-              </div>
-            </div>
-
-            <!-- Authentic Brand Accent Lime CTA Button -->
-            <a href="#opportunities"
-              class="w-full bg-accentLime hover:bg-accentLimeHover text-slate-950 font-extrabold text-sm py-4 rounded-full transition-all shadow-xl shadow-accentLime/20 flex items-center justify-center gap-2 group/btn">
-              <span>Explore Funds</span>
-              <svg
-                class="w-4 h-4 stroke-[3] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </a>
-          </div>
-
-        </div>
-
-        <!-- CARD 2: INVEST IN INDIVIDUAL INVESTMENTS (IMAGE BASE WITH DARK GRADIENT OVERLAY) -->
-        <div
-          class="reveal-right relative rounded-[2.5rem] overflow-hidden min-h-[560px] flex flex-col justify-between p-8 md:p-12 shadow-2xl group border border-white/10 bg-black">
-
-          <!-- Background Image -->
-          <div class="absolute inset-0 z-0">
-            <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80"
-              alt="Invest in individual Investments"
-              class="w-full h-full object-cover filter brightness-[0.55] group-hover:scale-105 transition-transform duration-700">
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/75 to-black/40"></div>
-          </div>
-
-          <!-- Top Navigation Pill Bar -->
-          <div class="relative z-10 flex items-center justify-between">
-            <span
-              class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white text-xs font-extrabold px-4 py-2 rounded-full border border-white/20 uppercase tracking-wider">
-              <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m3 0h1m-1-4h.01M9 16h.01M9 12h.01M9 8h.01M15 16h.01M15 12h.01M15 8h.01" />
-              </svg>
-              DIRECT INVESTMENTS
-            </span>
-
-            <button
-              class="w-10 h-10 rounded-full bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:bg-accentLime group-hover:text-slate-950 transition-all shadow-lg">
-              <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Bottom Editorial Content Box -->
-          <div class="relative z-10 mt-auto pt-20">
-            <h3 class="text-3xl md:text-5xl text-white font-extrabold leading-tight mb-4">
-              Invest in individual Investments
-            </h3>
-
-            <p class="text-slate-200 text-sm md:text-base leading-relaxed mb-8 font-normal max-w-xl">
-              Take direct positions in vetted real estate, technology, and impact deals led by experienced Sponsors.
-            </p>
-
-            <!-- Floating Translucent Metric Strip -->
-            <div
-              class="bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 p-4 md:p-5 grid grid-cols-3 gap-2 mb-6 text-center">
-              <div>
-                <span class="block text-xl md:text-2xl font-extrabold text-white num-tabular">40+</span>
-                <span class="block text-[11px] text-slate-300 font-bold uppercase mt-1">Live Investments</span>
-              </div>
-              <div class="border-x border-white/15">
-                <span class="block text-xl md:text-2xl font-extrabold text-accentLime num-tabular">$210M</span>
-                <span class="block text-[11px] text-slate-300 font-bold uppercase mt-1">Funded to date</span>
-              </div>
-              <div>
-                <span class="block text-xl md:text-2xl font-extrabold text-white num-tabular">5-step</span>
-                <span class="block text-[11px] text-slate-300 font-bold uppercase mt-1">Diligence</span>
-              </div>
-            </div>
-
-            <!-- Authentic Brand Accent Lime CTA Button -->
-            <a href="#opportunities"
-              class="w-full bg-accentLime hover:bg-accentLimeHover text-slate-950 font-extrabold text-sm py-4 rounded-full transition-all shadow-xl shadow-accentLime/20 flex items-center justify-center gap-2 group/btn">
-              <span>Browse Investments</span>
-              <svg
-                class="w-4 h-4 stroke-[3] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
-              </svg>
-            </a>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ==================== LEAFLET INTERACTIVE GLOBAL MAP SECTION ==================== -->
-  <section class="py-20 md:py-28 bg-[#050E1A] text-white border-b border-white/10" id="global-hubs">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-
-      <!-- Section Header with Right Floating Action Button -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 reveal-up">
-        <div>
-          <span class="text-xs font-bold tracking-widest text-accentLime uppercase block mb-3">GLOBAL PRESENCE &amp;
-            ADVISORY NETWORK</span>
-          <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            NRB Hosts &amp; <span class="text-accentLime">Global Advisory Hubs</span>
-          </h2>
-          <p class="text-slate-300 text-base md:text-lg mt-3 max-w-2xl">
-            Instant access, seamless digital onboarding, and a human touch wherever you are in the world.
+          <p class="text-slate-600 text-base leading-relaxed font-normal pt-1 max-w-xl">
+            Guided by Bangladesh’s most respected central bank governors, senior regulators, and global financial leadership dedicated to sovereign capital protection.
           </p>
         </div>
 
-        <a href="#get-started"
-          class="bg-slate-100 hover:bg-accentLime hover:text-slate-950 text-slate-950 text-xs font-bold px-6 py-3 rounded-full transition-all shadow-xl flex items-center gap-2 self-start md:self-auto">
-          <span>Find a hub near you</span>
-          <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
-      </div>
+        <!-- Right Side: Frameless Human Metric Grid -->
+        <div class="lg:col-span-6">
+          
+          <!-- Frameless Stat Strips with Left Accent Bars (3 Columns) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-6">
+            
+            <!-- Stat 1 -->
+            <div class="border-l-2 border-midnight pl-4 py-1 space-y-1">
+              <span class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-midnight leading-none block" id="counter1">$1B+</span>
+              <span class="text-xs text-slate-500 font-bold tracking-wide uppercase block">Market Capitalization</span>
+            </div>
 
-      <!-- Leaflet Interactive Dark Map Container -->
-      <div
-        class="reveal-zoom delay-200 bg-[#0B1F3B]/60 rounded-[2.5rem] border border-white/10 p-3 md:p-6 shadow-2xl backdrop-blur-xl mb-12 relative overflow-hidden">
-        <div id="leafletGlobalMap" class="w-full h-[460px] md:h-[540px] rounded-[2rem] overflow-hidden z-10"></div>
+            <!-- Stat 2 -->
+            <div class="border-l-2 border-midnight pl-4 py-1 space-y-1">
+              <span class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-midnight leading-none block" id="counter2">30+</span>
+              <span class="text-xs text-slate-500 font-bold tracking-wide uppercase block">Global NRB Countries</span>
+            </div>
 
-        <div
-          class="flex flex-col sm:flex-row items-center justify-between border-t border-white/10 pt-6 mt-4 text-xs text-slate-300 px-4 gap-4">
-          <div class="flex items-center gap-6">
-            <span class="flex items-center gap-2">
-              <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
-              <strong class="text-white font-bold">Dhaka Capital HQ 🇧🇩 (Global Hub Central)</strong>
-            </span>
-            <span class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-accentLime"></span>
-              <strong class="text-slate-200">25+ NRB Advisory Desks</strong>
-            </span>
+            <!-- Stat 3: 12,000+ NRB Investors -->
+            <div class="border-l-2 border-gold-600 pl-4 py-1 space-y-1">
+              <span class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-gold-600 leading-none block" id="counter3">12,000+</span>
+              <span class="text-xs text-slate-500 font-bold tracking-wide uppercase block">NRB Investors</span>
+            </div>
+
           </div>
-          <div>
-            <span class="text-slate-400">Pulsing trajectories illustrate direct FX remittance routes to Bangladesh
-              Bank</span>
-          </div>
-        </div>
-      </div>
 
-    </div>
-  </section>
-
-  <!-- ==================== ONBOARDING WORKFLOW (EXACT SIMPLIFIED COPY) ==================== -->
-  <section class="py-20 md:py-28 bg-white border-b border-slate-200/80" id="how-it-works">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-
-      <!-- Executive Workflow Section Header -->
-      <div
-        class="flex flex-col md:flex-row md:items-end justify-between mb-16 pb-8 border-b border-slate-200/80 gap-6 reveal-up">
-        <div>
-          <div
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brandTeal/10 border border-brandTeal/20 text-brandTeal text-xs font-mono font-bold tracking-widest uppercase mb-4">
-            <span class="w-1.5 h-1.5 rounded-full bg-brandTeal"></span>
-            HOW IT WORKS
-          </div>
-          <h2 class="text-3xl md:text-5xl font-extrabold text-brandNavy tracking-tight leading-tight">
-            How Investing Works <span class="text-brandTeal">in 4 Simple Steps.</span>
-          </h2>
-        </div>
-        <div
-          class="bg-slate-100 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-full border border-slate-200/80 shrink-0 self-start md:self-auto">
-          4-Step Accredited Process
-        </div>
-      </div>
-
-      <!-- 4 CLEAN MINIMALIST STEP CARDS -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-
-        <!-- STEP 01 -->
-        <div
-          class="reveal-up delay-100 bg-slate-50/80 rounded-[2rem] border border-slate-200/80 p-8 hover:bg-white hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-          <div>
-            <span class="text-3xl font-extrabold text-brandTeal block mb-6 font-mono">01</span>
-            <h3 class="text-xl font-extrabold text-brandNavy mb-3 group-hover:text-brandTeal transition-colors">
-              Create your account
-            </h3>
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Join free in minutes and complete secure KYC verification with help from your nearest NRB Host.
-            </p>
-          </div>
-        </div>
-
-        <!-- STEP 02 -->
-        <div
-          class="reveal-up delay-200 bg-slate-50/80 rounded-[2rem] border border-slate-200/80 p-8 hover:bg-white hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-          <div>
-            <span class="text-3xl font-extrabold text-brandTeal block mb-6 font-mono">02</span>
-            <h3 class="text-xl font-extrabold text-brandNavy mb-3 group-hover:text-brandTeal transition-colors">
-              Explore opportunities
-            </h3>
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Browse curated Funds and Investments with full disclosures, sponsor details, and independent due
-              diligence.
-            </p>
-          </div>
-        </div>
-
-        <!-- STEP 03 -->
-        <div
-          class="reveal-up delay-300 bg-slate-50/80 rounded-[2rem] border border-slate-200/80 p-8 hover:bg-white hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-          <div>
-            <span class="text-3xl font-extrabold text-brandTeal block mb-6 font-mono">03</span>
-            <h3 class="text-xl font-extrabold text-brandNavy mb-3 group-hover:text-brandTeal transition-colors">
-              Invest with confidence
-            </h3>
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Commit capital through escrow-backed, milestone-based structures with transparent terms and minimums.
-            </p>
-          </div>
-        </div>
-
-        <!-- STEP 04 -->
-        <div
-          class="reveal-up delay-400 bg-slate-50/80 rounded-[2rem] border border-slate-200/80 p-8 hover:bg-white hover:shadow-xl transition-all duration-300 flex flex-col justify-between group">
-          <div>
-            <span class="text-3xl font-extrabold text-brandTeal block mb-6 font-mono">04</span>
-            <h3 class="text-xl font-extrabold text-brandNavy mb-3 group-hover:text-brandTeal transition-colors">
-              Track performance
-            </h3>
-            <p class="text-slate-600 text-sm leading-relaxed font-normal">
-              Monitor commitments, capital calls, distributions, IRR and MOIC from a single institutional dashboard.
-            </p>
-          </div>
         </div>
 
       </div>
 
-    </div>
-  </section>
+      <!-- BOTTOM ROW: ULTRA-REFINED EXECUTIVE SHOWCASE CARD -->
+      <div class="w-full bg-emerald-950/5 border border-emerald-900/10 rounded-2xl p-8 sm:p-12 relative overflow-hidden shadow-sm" id="leaderSpotlightStage">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          
+          <!-- Left Column: Leader Portrait with Floating Integrated Controls -->
+          <div class="lg:col-span-5 relative flex flex-col items-center w-full max-w-md mx-auto lg:mx-0">
+            <div class="w-full h-80 sm:h-96 rounded-xl overflow-hidden border border-emerald-900/15 bg-white relative shadow-md">
+              <img src="asset/Dr. Ahsan H. Mansur.jpg" alt="Dr. Ahsan H. Mansur" class="w-full h-full object-cover transition-all duration-500" id="leaderPhoto">
+            </div>
 
-  <!-- ==================== INVESTOR PORTFOLIO TERMINAL ==================== -->
-  <section class="py-20 md:py-28 bg-brandDark text-white" id="dashboard">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-      <!-- Institutional Dark Terminal Header -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 pb-6 border-b border-white/10 gap-6">
-        <div>
-          <div
-            class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-accentLime/10 border border-accentLime/30 text-accentLime text-xs font-mono font-bold tracking-widest uppercase mb-3">
-            <span class="w-2 h-2 rounded-full bg-accentLime animate-pulse"></span>
-            PORTFOLIO INTELLIGENCE
-          </div>
-          <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Your Portfolio, Clearly in View</h2>
-        </div>
-        <div class="text-xs font-mono text-slate-400 self-start md:self-auto">
-          Real-time audited telemetry
-        </div>
-      </div>
-
-      <!-- Dashboard Terminal UI -->
-      <div
-        class="reveal-zoom delay-200 bg-black/60 rounded-3xl border border-white/10 p-6 md:p-10 shadow-2xl backdrop-blur-xl">
-        <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-white/10 gap-4">
-          <div>
-            <h4 class="text-lg font-bold text-white">Dr. Tanvir Ahmed, MD</h4>
-            <span class="text-xs text-slate-300">London, UK • Verified NRB Accredited Investor</span>
-          </div>
-
-          <div class="flex gap-1 bg-white/5 p-1 rounded-full border border-white/10">
-            <button
-              class="period-btn px-4 py-1.5 text-xs font-bold rounded-full text-slate-400 hover:text-white transition focus-visible:ring-2 focus-visible:ring-accentLime"
-              data-period="1Y">1Y</button>
-            <button
-              class="period-btn active px-4 py-1.5 text-xs font-bold rounded-full bg-brandTeal text-white transition focus-visible:ring-2 focus-visible:ring-accentLime"
-              data-period="3Y">3Y</button>
-            <button
-              class="period-btn px-4 py-1.5 text-xs font-bold rounded-full text-slate-400 hover:text-white transition focus-visible:ring-2 focus-visible:ring-accentLime"
-              data-period="ALL">ALL TIME</button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
-            <span class="block text-xs text-slate-300 mb-1">Total Portfolio Value</span>
-            <span class="text-2xl md:text-3xl font-extrabold text-white num-tabular" id="dbPortfolioVal">$284,650</span>
-            <span class="text-xs text-emerald-400 font-bold block mt-1">↑ +17.7% Net Return</span>
-          </div>
-          <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
-            <span class="block text-xs text-slate-300 mb-1">Realized Dividends</span>
-            <span class="text-2xl md:text-3xl font-extrabold text-white num-tabular" id="dbTotalReturn">+$42,850</span>
-            <span class="text-xs text-slate-300 block mt-1">Includes $14.2k cash paid</span>
-          </div>
-          <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
-            <span class="block text-xs text-slate-300 mb-1">Net IRR</span>
-            <span class="text-2xl md:text-3xl font-extrabold text-accentLime num-tabular" id="dbIrr">18.7%</span>
-            <span class="text-xs text-slate-300 block mt-1">Benchmark: +12.4%</span>
-          </div>
-          <div class="bg-white/5 p-5 rounded-2xl border border-white/10">
-            <span class="block text-xs text-slate-300 mb-1">MOIC</span>
-            <span class="text-2xl md:text-3xl font-extrabold text-white num-tabular" id="dbMoic">1.42x</span>
-            <span class="text-xs text-slate-300 block mt-1">DPI: 0.35x</span>
-          </div>
-        </div>
-
-        <div class="bg-white/5 p-6 rounded-2xl border border-white/10">
-          <h5 class="text-sm font-bold text-white mb-4">Portfolio Trajectory History</h5>
-          <div class="w-full overflow-hidden">
-            <svg id="portfolioChart" viewBox="0 0 700 220" class="w-full h-52">
-              <line x1="40" y1="30" x2="660" y2="30" stroke="#334155" stroke-dasharray="4" />
-              <line x1="40" y1="80" x2="660" y2="80" stroke="#334155" stroke-dasharray="4" />
-              <line x1="40" y1="130" x2="660" y2="130" stroke="#334155" stroke-dasharray="4" />
-              <line x1="40" y1="180" x2="660" y2="180" stroke="#334155" />
-
-              <text x="35" y="34" text-anchor="end" fill="#CBD5E1" font-size="10">$300k</text>
-              <text x="35" y="84" text-anchor="end" fill="#CBD5E1" font-size="10">$250k</text>
-              <text x="35" y="134" text-anchor="end" fill="#CBD5E1" font-size="10">$200k</text>
-              <text x="35" y="184" text-anchor="end" fill="#CBD5E1" font-size="10">$150k</text>
-
-              <polygon id="chartArea" points="60,170 160,150 260,125 360,100 460,65 560,45 640,32 640,180 60,180"
-                fill="url(#chartGrad)" />
-              <path id="chartPath" d="M60 170 Q 160 150, 260 125 T 460 65 T 640 32" fill="none" stroke="#A8F01D"
-                stroke-width="3" />
-
-              <circle cx="260" cy="125" r="4" fill="#A8F01D" />
-              <circle cx="460" cy="65" r="4" fill="#A8F01D" />
-              <circle cx="640" cy="32" r="5" fill="#22C55E" />
-
-              <text x="60" y="202" text-anchor="middle" fill="#CBD5E1" font-size="10">Q1 2024</text>
-              <text x="260" y="202" text-anchor="middle" fill="#CBD5E1" font-size="10">Q1 2025</text>
-              <text x="460" y="202" text-anchor="middle" fill="#CBD5E1" font-size="10">Q1 2026</text>
-              <text x="640" y="202" text-anchor="middle" fill="#CBD5E1" font-size="10">CURRENT</text>
-
-              <defs>
-                <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#A8F01D" stop-opacity="0.25" />
-                  <stop offset="100%" stop-color="#A8F01D" stop-opacity="0.0" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==================== FINAL BESPOKE PRIVATE BANKING CTA ==================== -->
-  <section class="py-24 bg-white border-t border-slate-200/80" id="get-started">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
-
-      <!-- High-End Private Banking CTA Box -->
-      <div
-        class="reveal-up bg-brandDark text-white rounded-[3rem] p-10 md:p-16 border border-white/10 shadow-2xl relative overflow-hidden group">
-
-        <!-- Glowing Lime Spotlight Accent -->
-        <div class="absolute -right-20 -top-20 w-96 h-96 bg-accentLime/15 rounded-full blur-3xl pointer-events-none">
-        </div>
-
-        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-
-          <!-- Left Column: Title & Audience Value Prop (7 Cols) -->
-          <div class="lg:col-span-7">
-            <span class="text-xs font-black tracking-widest text-accentLime uppercase block mb-4">START BUILDING YOUR
-              LEGACY</span>
-            <h2 class="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.08] mb-6">
-              Start Building Your Legacy in Bangladesh, <span class="text-accentLime">from
-                Wherever You Call Home.</span>
-            </h2>
-            <p class="text-slate-300 text-base md:text-lg font-normal leading-relaxed mb-8 max-w-xl">
-              Join over 12,000 Non-Resident Bangladeshis accessing institutionally audited funds, direct private equity,
-              and automated USD dividend repatriation.
-            </p>
-
-            <!-- 3 Target Audience Assurance Badges -->
-            <div class="flex flex-wrap items-center gap-6 text-xs text-slate-300 border-t border-white/10 pt-6">
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>BSEC &amp; Bank Custody Regulated</span>
+            <!-- UNIFIED SLIDER CONTROL STRIP (< 01 / 03 >) - EXACT 100% MATCHING WIDTH -->
+            <div class="flex items-center justify-between w-full mt-3 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-xs">
+              <div class="flex items-center space-x-2">
+                <button class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-gold-600 hover:text-white text-slate-700 flex items-center justify-center transition-all" id="prevLeaderBtn" title="Previous Leader">
+                  <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+                <button class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-gold-600 hover:text-white text-slate-700 flex items-center justify-center transition-all" id="nextLeaderBtn" title="Next Leader">
+                  <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
               </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>USD Dividend Wire Transfer</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 text-accentLime" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>100 Advisory Hubs Worldwide</span>
+
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-gold-600"></span>
+                <span class="text-xs text-slate-700 font-mono font-bold tracking-wider" id="leaderNumber">01 / 03</span>
               </div>
             </div>
           </div>
 
-          <!-- Right Column: Dual Action Buttons & Concierge Card (5 Cols) -->
-          <div
-            class="lg:col-span-5 bg-white/5 p-8 md:p-10 rounded-[2.2rem] border border-white/10 backdrop-blur-xl flex flex-col justify-between">
-            <div>
-              <span class="text-xs font-bold text-accentLime uppercase tracking-wider block mb-2">ACCELERATED
-                ONBOARDING</span>
-              <h3 class="text-2xl font-extrabold text-white mb-3">Open Accredited Account</h3>
-              <p class="text-xs text-slate-300 leading-relaxed mb-8">
-                Instant digital KYC verification for UK, GCC, US, and Asian NRB passport holders.
+          <!-- Right Column: Leader Bio & Details -->
+          <div class="lg:col-span-7 space-y-6 flex flex-col justify-between">
+            
+            <div class="space-y-4">
+              <span class="inline-block px-3.5 py-1 rounded-md bg-amber-100/80 text-gold-700 text-xs font-extrabold uppercase tracking-wider border border-amber-200/80" id="leaderBadge">
+                CHAIRMAN & FOUNDER
+              </span>
+
+              <h3 class="text-3xl sm:text-4xl font-serif font-extrabold text-midnight" id="leaderName">
+                Dr. Ahsan H. Mansur
+              </h3>
+
+              <p class="text-gold-600 text-sm font-bold tracking-wide" id="leaderTitle">
+                Chairman, mCapital Ltd.
+              </p>
+
+              <p class="text-slate-600 text-base leading-relaxed font-normal pt-1" id="leaderBio">
+                Former Governor, Bangladesh Bank; 27-year IMF career in monetary policy and financial-sector reform.
               </p>
             </div>
 
-            <div class="space-y-4">
-              <a href="#opportunities"
-                class="w-full bg-accentLime hover:bg-accentLimeHover text-slate-950 font-extrabold text-sm py-4 rounded-full transition-all shadow-xl flex items-center justify-center gap-2 group/btn">
-                <span>Open Accredited Account</span>
-                <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform stroke-[3]" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </a>
+            <!-- Leader Quote -->
+            <div class="pt-4 border-t border-slate-200/80 flex items-start gap-4">
+              <i class="fa-solid fa-quote-left text-2xl text-gold-500 shrink-0 mt-1"></i>
+              <p class="text-sm text-slate-600 italic font-medium leading-relaxed" id="leaderQuote">
+                “Transparent financial stewardship and BSEC compliance are the cornerstone of diaspora wealth growth in Bangladesh.”
+              </p>
+            </div>
 
-              <a href="#global-hubs"
-                class="w-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs py-3.5 rounded-full transition-all border border-white/20 flex items-center justify-center gap-2">
-                <span>Book Private Advisor Call</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                    d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
+            <!-- Action Button: Ultra-Crisp White Text on Gold Pill Button -->
+            <div class="pt-2">
+              <a href="#about" class="btn-fill-left inline-flex items-center gap-3 px-6 py-3 rounded-full font-extrabold text-xs text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/30" style="--fill-color: #042F2E;">
+                <span>More About Governance</span>
+                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
               </a>
             </div>
+
           </div>
 
         </div>
@@ -1061,162 +463,864 @@
     </div>
   </section>
 
-  <!-- ==================== FOOTER (MODERN INSTITUTIONAL DESIGN MATCHING REFERENCE) ==================== -->
-  <!-- ==================== FOOTER (BRAND DARK THEME DESIGN MATCHING REFERENCE) ==================== -->
-  <footer class="bg-[#050E1A] text-white pt-20 md:pt-24 pb-12 border-t border-white/10" id="contact">
-    <div class="max-w-7xl mx-auto px-6 md:px-12">
+  <!-- INTERMEDIATE SECTION: TAILORED WEALTH GOALS DISCOVERY (CLEAN MINIMALIST LAYOUT) -->
+  <section class="w-full py-24 bg-white text-slate-800 relative overflow-hidden border-t border-slate-100" id="discover-goals">
+    <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+        
+        <!-- LEFT COLUMN: PORTRAIT WITH 3 CLEAN FLOATING GOAL CHIPS & THOUGHT TRAIL -->
+        <div class="lg:col-span-6 relative flex items-center justify-center py-8" id="goalVisualStage">
+          
+          <!-- Concentric Elegant Orbit Line -->
+          <div class="absolute w-72 h-72 sm:w-88 sm:h-88 rounded-full border border-dashed border-emerald-800/20 animate-[spin_60s_linear_infinite] pointer-events-none"></div>
 
-      <!-- Top Grid: Brand & Contact (Column 1 & 2) + Platform Links + Members Links + Company Links -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-16 pb-16 border-b border-white/10">
-
-        <!-- Column 1 & 2: Brand Info & Contact -->
-        <div class="lg:col-span-2 space-y-6">
-          <!-- Transparent PNG Footer Logo (Prominent Large Size) -->
-          <div class="flex items-center gap-4">
-            <img src="asset/logo.png" alt="mCapital Logo"
-              class="h-14 md:h-16 w-auto object-contain filter drop-shadow-lg">
+          <!-- Central Circular Portrait Frame -->
+          <div class="relative w-56 h-56 sm:w-68 sm:h-68 rounded-full p-2 bg-gradient-to-tr from-emerald-900 via-midnight to-gold-500 shadow-2xl z-10">
+            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 border-2 border-white relative">
+              <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=800&auto=format&fit=crop" alt="Global Diaspora Investor" class="w-full h-full object-cover object-top" id="goalInvestorPhoto">
+              <div class="absolute inset-0 bg-gradient-to-t from-midnight/40 to-transparent"></div>
+            </div>
           </div>
 
-          <div>
-            <span class="text-xs font-mono font-bold tracking-widest text-accentLime uppercase block mb-2">DIASPORA
-              CAPITAL
-              PLATFORM</span>
-            <p class="text-sm text-slate-300 font-normal leading-relaxed max-w-sm">
-              The bridge connecting diaspora capital with Bangladesh opportunities.
+          <!-- THOUGHT TRAIL DOTS (Connects portrait to dream bubbles) -->
+          <div class="thought-dot absolute top-8 left-20 sm:left-28 w-4 h-4 rounded-full bg-emerald-800/25 border border-emerald-800/20 shadow-xs z-15 pointer-events-none" id="thoughtDot1"></div>
+          <div class="thought-dot absolute top-2 left-32 sm:left-40 w-3 h-3 rounded-full bg-gold-500/35 border border-gold-500/30 shadow-xs z-15 pointer-events-none" id="thoughtDot2"></div>
+          <div class="thought-dot absolute -top-4 left-44 sm:left-52 w-2 h-2 rounded-full bg-emerald-900/40 z-15 pointer-events-none" id="thoughtDot3"></div>
+
+          <!-- ARCHITECTURAL DREAM BUBBLE 1: Real Estate & Home (Top Left) -->
+          <div class="floating-badge absolute -top-6 left-2 sm:left-8 z-20 w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-white/95 backdrop-blur-md border border-emerald-800/20 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-gold-500 group" id="floatingBadge0" title="Prime Real Estate & Assets">
+            <svg class="w-8 h-8 text-midnight group-hover:text-gold-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21h18M5 21V7l8-4v18M13 21V11l6 3v7M9 9v.01M9 12v.01M9 15v.01M9 18v.01" />
+            </svg>
+          </div>
+
+          <!-- ARCHITECTURAL DREAM BUBBLE 2: Wealth & Enterprise Growth (Top Center/Right) -->
+          <div class="floating-badge absolute -top-10 right-14 sm:right-22 z-20 w-15 h-15 sm:w-17 sm:h-17 rounded-full bg-white/95 backdrop-blur-md border border-gold-500/40 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-gold-500 group" id="floatingBadge1" title="Wealth & High Growth">
+            <svg class="w-7 h-7 text-gold-600 group-hover:scale-110 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </svg>
+          </div>
+
+          <!-- ARCHITECTURAL DREAM BUBBLE 3: Sovereign Security & Diaspora Vault (Top Right) -->
+          <div class="floating-badge absolute -top-2 -right-2 sm:right-4 z-20 w-16 h-16 sm:w-18 sm:h-18 rounded-full bg-white/95 backdrop-blur-md border border-emerald-800/25 shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-gold-500 group" id="floatingBadge2" title="Sovereign Security & Global Freedom">
+            <svg class="w-8 h-8 text-emerald-800 group-hover:text-gold-600 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: CLEAN, PUNCHY HEADLINE & SINGLE CTA -->
+        <div class="lg:col-span-6 space-y-6 max-w-xl">
+          
+          <div class="space-y-4">
+            <h2 class="text-4xl sm:text-5xl font-serif font-extrabold text-midnight leading-tight tracking-tight">
+              Discover the Perfect Investment for Your Goals
+            </h2>
+            <p class="text-slate-600 text-base sm:text-lg leading-relaxed font-normal">
+              Curated sovereign fixed yields, venture equity, and prime commercial assets tailored to your diaspora wealth ambition.
             </p>
           </div>
 
-          <div class="space-y-1.5 pt-4 border-t border-white/10 text-sm text-slate-300">
-            <span class="block text-xs font-bold text-white uppercase tracking-wider mb-1">mCapital Global LLC</span>
-            <a href="mailto:connect@mcapitalbd.com"
-              class="block text-sm text-slate-300 hover:text-accentLime transition-colors">connect@mcapitalbd.com</a>
-            <a href="tel:+12123473330" class="block text-sm text-slate-300 hover:text-accentLime transition-colors">+1
-              (212) 347-3330</a>
+          <!-- CLEAN SINGLE ACTION BUTTON -->
+          <div class="pt-2">
+            <a href="#opportunities" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" style="--fill-color: #042F2E;">
+              <span>Explore Opportunities</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
           </div>
 
-          <!-- Lime Contact Pill CTA Button Pair (Matching Reference Image) -->
-          <div class="flex items-center gap-2 pt-2">
-            <a href="#get-started"
-              class="bg-accentLime hover:bg-accentLimeHover text-slate-950 text-xs md:text-sm font-extrabold px-6 py-3 rounded-full transition-all shadow-lg flex items-center justify-center">
-              <span>Contact Us</span>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 3RD SECTION: WAYS TO INVEST — TWO WAYS TO INVEST. ONE TRUSTED PLATFORM. (CLEAN WHITE BACKGROUND) -->
+  <section class="w-full py-28 bg-white text-slate-800 relative overflow-hidden border-t border-slate-100" id="ways-to-invest">
+    <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 space-y-14">
+      
+      <!-- SECTION HEADER ON CLEAN WHITE -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
+        <div class="max-w-2xl space-y-3">
+          <span class="text-xs text-gold-600 font-extrabold uppercase tracking-[0.35em] block">
+            (Ways to Invest)
+          </span>
+          <h2 class="text-4xl sm:text-5xl font-serif font-extrabold text-midnight leading-tight tracking-tight">
+            Two ways to invest. One trusted platform.
+          </h2>
+          <p class="text-slate-600 text-base sm:text-lg leading-relaxed font-normal pt-1">
+            Managed Funds or direct Investments — with institutional-grade transparency and governance either way.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 self-start md:self-end">
+          <span class="px-4 py-2 rounded-full bg-emerald-950/5 border border-emerald-900/15 text-midnight text-xs font-mono font-bold">
+            BSEC Regulated Dual Gateway
+          </span>
+        </div>
+      </div>
+
+      <!-- DUAL-GATEWAY TWIN SOVEREIGN CARDS (MANAGED FUNDS VS DIRECT INVESTMENTS) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch">
+        
+        <!-- CARD 1: MANAGED FUNDS (DARK THEME) -->
+        <div class="ways-card h-full rounded-3xl p-8 sm:p-12 bg-midnight text-white flex flex-col justify-between space-y-8 shadow-xl border border-emerald-800/40 relative overflow-hidden group hover:shadow-2xl hover:border-gold-500/50 transition-all duration-300">
+          <div class="absolute inset-0 bg-gradient-to-br from-emerald-900/40 via-transparent to-black/40 pointer-events-none"></div>
+          
+          <div class="space-y-6 relative z-10">
+            <!-- Top Tag & Number -->
+            <div class="flex items-center justify-between">
+              <span class="px-3.5 py-1.5 rounded-full bg-gold-600/90 text-white text-xs font-mono font-extrabold tracking-wider backdrop-blur-md">
+                MANAGED FUNDS
+              </span>
+              <span class="text-xs font-mono font-bold text-slate-400">01</span>
+            </div>
+
+            <!-- Title & Description -->
+            <div class="space-y-3">
+              <h3 class="text-3xl sm:text-4xl font-serif font-extrabold text-white leading-tight">
+                Invest in Managed Funds
+              </h3>
+              <p class="text-slate-300 text-base leading-relaxed font-normal min-h-[48px]">
+                Diversified, professionally managed portfolios across sectors and geographies — tracked from a single dashboard.
+              </p>
+            </div>
+
+            <!-- 3 Frameless Stat Strips with Accent Left Bars -->
+            <div class="grid grid-cols-3 gap-4 pt-4 border-t border-white/15">
+              
+              <div class="border-l-2 border-gold-500 pl-3.5 py-1 space-y-1">
+                <span class="text-2xl sm:text-3xl font-serif font-extrabold text-gold-400 block font-mono">24.5%</span>
+                <span class="text-[11px] text-slate-300 font-bold uppercase tracking-wider block">Avg. IRR</span>
+              </div>
+
+              <div class="border-l-2 border-emerald-400 pl-3.5 py-1 space-y-1">
+                <span class="text-2xl sm:text-3xl font-serif font-extrabold text-white block font-mono">1.38x</span>
+                <span class="text-[11px] text-slate-300 font-bold uppercase tracking-wider block">Net MOIC</span>
+              </div>
+
+              <div class="border-l-2 border-slate-400 pl-3.5 py-1 space-y-1">
+                <span class="text-2xl sm:text-3xl font-serif font-extrabold text-white block font-mono">12</span>
+                <span class="text-[11px] text-slate-300 font-bold uppercase tracking-wider block">Active Funds</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Action CTA Button -->
+          <div class="pt-4 relative z-10">
+            <a href="https://mcb-mock.vercel.app/investors/funds" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" style="--fill-color: #022C22;">
+              <span>Explore Funds</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
-            <a href="#get-started"
-              class="w-10 h-10 rounded-full bg-accentLime hover:bg-accentLimeHover text-slate-950 flex items-center justify-center transition-all shadow-lg shrink-0"
-              aria-label="Contact Us Arrow">
-              <svg class="w-4 h-4 stroke-[3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M17 7H7M17 7V17" />
+          </div>
+
+        </div>
+
+        <!-- CARD 2: DIRECT INVESTMENTS (LIGHT LUXURY THEME) -->
+        <div class="ways-card h-full rounded-3xl p-8 sm:p-12 bg-white text-slate-900 flex flex-col justify-between space-y-8 shadow-xl border-2 border-slate-200/90 relative overflow-hidden group hover:shadow-2xl hover:border-gold-500/50 transition-all duration-300">
+          
+          <div class="space-y-6 relative z-10">
+            <!-- Top Tag & Number -->
+            <div class="flex items-center justify-between">
+              <span class="px-3.5 py-1.5 rounded-full bg-slate-100 text-midnight text-xs font-mono font-extrabold tracking-wider border border-slate-200">
+                DIRECT INVESTMENTS
+              </span>
+              <span class="text-xs font-mono font-bold text-slate-400">02</span>
+            </div>
+
+            <!-- Title & Description -->
+            <div class="space-y-3">
+              <h3 class="text-3xl sm:text-4xl font-serif font-extrabold text-midnight leading-tight">
+                Invest in Direct Deals
+              </h3>
+              <p class="text-slate-600 text-base leading-relaxed font-normal min-h-[48px]">
+                Take direct positions in vetted real estate, technology, and impact deals led by experienced Sponsors.
+              </p>
+            </div>
+
+            <!-- 3 Frameless Stat Strips with Accent Left Bars -->
+            <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+              
+              <div class="border-l-2 border-midnight pl-3.5 py-1 space-y-1">
+                <span class="text-2xl sm:text-3xl font-serif font-extrabold text-midnight block font-mono">40+</span>
+                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">Live Deals</span>
+              </div>
+
+              <div class="border-l-2 border-gold-600 pl-3.5 py-1 space-y-1">
+                <span class="text-2xl sm:text-3xl font-serif font-extrabold text-gold-700 block font-mono">$210M</span>
+                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">Funded to Date</span>
+              </div>
+
+              <div class="border-l-2 border-midnight pl-3.5 py-1 space-y-1">
+                <span class="text-2xl sm:text-3xl font-serif font-extrabold text-midnight block font-mono">5-Step</span>
+                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-wider block">Diligence</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Action CTA Button -->
+          <div class="pt-4 relative z-10">
+            <a href="https://mcb-mock.vercel.app/investors/direct-investments" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-midnight hover:text-white border border-midnight shadow-md shadow-midnight/20 transition-all" style="--fill-color: #D97706;">
+              <span>Browse Investments</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4TH SECTION: LIVE FUNDS — INTEGRATED 4-COLUMN SOVEREIGN MONOLITH (EDGE-TO-EDGE ARCHITECTURAL GRID) -->
+  <section class="w-full bg-midnight text-white relative overflow-hidden border-t border-b border-slate-200" id="live-funds">
+    
+    <div class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-white/10">
+      
+      <!-- ==================== COLUMN 01: THE MASTER EDITORIAL THESIS ==================== -->
+      <div class="relative h-[540px] sm:h-[580px] lg:h-[620px] bg-midnight p-8 sm:p-10 flex flex-col justify-between z-10">
+        
+        <!-- Top Status & Dual Selector Pill -->
+        <div class="space-y-3">
+          <span class="text-xs font-mono font-extrabold text-gold-400 uppercase tracking-[0.3em] block">
+            PORTFOLIO ALLOCATION
+          </span>
+          
+          <!-- Dual Sovereign Switcher (Managed Funds vs Direct Deals) -->
+          <div class="inline-flex p-1 rounded-full bg-white/10 border border-white/15 gap-1" id="monolithDealToggle">
+            <button class="monolith-mode-btn active px-3.5 py-1.5 rounded-full font-mono text-xs font-bold text-white bg-gold-600 shadow-xs transition-all duration-300" data-mode="funds">
+              Funds (3)
+            </button>
+            <button class="monolith-mode-btn px-3.5 py-1.5 rounded-full font-mono text-xs font-bold text-slate-300 hover:text-white transition-all duration-300" data-mode="direct">
+              Direct Deals (3)
+            </button>
+          </div>
+        </div>
+
+        <!-- Center Editorial Thesis -->
+        <div class="space-y-4 my-auto">
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-white leading-tight tracking-tight" id="monolithHeading">
+            Open for Investment.
+          </h2>
+          <p class="text-slate-300 text-sm leading-relaxed font-normal" id="monolithSubHeading">
+            Direct sovereign diaspora syndication into high-conviction Bangladesh growth sectors with audited institutional governance.
+          </p>
+        </div>
+
+        <!-- Bottom Link Action (Consistent Signature Button) -->
+        <div class="pt-4 border-t border-white/10">
+          <a href="https://mcb-mock.vercel.app/investors/funds" target="_blank" class="btn-fill-left inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/10 hover:text-white text-white font-extrabold text-xs border border-white/20 shadow-xs transition-all" id="monolithDeckLink" style="--fill-color: #D97706;">
+            <span>View all opportunities</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ==================== COLUMN 02: POSITION 01 ==================== -->
+      <div class="relative h-[540px] sm:h-[580px] lg:h-[620px] overflow-hidden group cursor-pointer bg-slate-950 rounded-none" id="panelStage0">
+        
+        <!-- Background Photography -->
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 opacity-90" id="panelBg0" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1200&auto=format&fit=crop');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10"></div>
+
+        <!-- Top Static Bar -->
+        <div class="absolute top-0 inset-x-0 p-6 sm:p-8 flex items-center justify-between z-10">
+          <span class="text-xs font-mono font-bold tracking-widest text-gold-400 uppercase" id="panelTag0">
+            01 / MASTER FUND
+          </span>
+          <span class="text-xs font-mono text-slate-300" id="panelLocation0">
+            DHAKA · GLOBAL
+          </span>
+        </div>
+
+        <!-- Default Resting State (Bottom) -->
+        <div class="absolute inset-x-0 bottom-0 p-6 sm:p-8 z-10 space-y-4 transform transition-transform duration-500 group-hover:-translate-y-6">
+          <h3 class="text-2xl font-serif font-extrabold text-white leading-tight" id="panelTitle0">
+            mCapital Bangladesh Diaspora Fund
+          </h3>
+          
+          <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/20 text-white font-mono">
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Raised</span>
+              <span class="text-base font-bold text-gold-400" id="panelRaised0">38%</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Target</span>
+              <span class="text-base font-bold text-white" id="panelTarget0">$1B</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Target IRR</span>
+              <span class="text-base font-bold text-gold-400" id="panelIrr0">22.0%</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs font-mono text-gold-400 opacity-80 group-hover:opacity-0 transition-opacity">
+            <i class="fa-solid fa-arrow-up text-[10px]"></i>
+            <span>Hover for details</span>
+          </div>
+        </div>
+
+        <!-- RISING CURTAIN: NEUTRAL BLUR LIGHT BLACK GLASS -->
+        <div class="absolute inset-x-0 bottom-0 bg-black/85 backdrop-blur-xl p-6 sm:p-8 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-20 border-t border-gold-500/40 rounded-none flex flex-col justify-between space-y-6">
+          
+          <div class="space-y-4">
+            <span class="text-[10px] font-mono font-extrabold text-gold-400 uppercase tracking-widest block" id="panelThesisTag0">
+              FUND THESIS & STRATEGY
+            </span>
+            <h4 class="text-2xl font-serif font-extrabold text-white leading-tight" id="panelCurtainTitle0">
+              mCapital Bangladesh Diaspora Fund
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed font-normal" id="panelDesc0">
+              Diaspora master fund allocating across Financial Services (60%), Distress Asset Recovery (30%) and Healthcare Impact (10%).
+            </p>
+
+            <div class="grid grid-cols-2 gap-3 py-3 border-t border-b border-white/15 text-xs font-mono">
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Min. Investment</span>
+                <span class="text-sm font-bold text-white" id="panelMin0">$5,000</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Target IRR</span>
+                <span class="text-sm font-bold text-gold-400" id="panelCurtainIrr0">22.0%</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Target Size</span>
+                <span class="text-sm font-bold text-white" id="panelCurtainTarget0">$1 Billion</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase" id="panelGovTag0">Governance</span>
+                <span class="text-sm font-bold text-emerald-400" id="panelGovVal0">BSEC Audited</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <a href="https://mcb-mock.vercel.app/opportunities/bangladesh-diaspora-fund" target="_blank" class="btn-fill-left inline-flex items-center justify-between w-full px-6 py-3.5 rounded-full font-extrabold text-xs text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" id="panelBtn0" style="--fill-color: #042F2E;">
+              <span>Enter Dealroom</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==================== COLUMN 03: POSITION 02 ==================== -->
+      <div class="relative h-[540px] sm:h-[580px] lg:h-[620px] overflow-hidden group cursor-pointer bg-slate-950 rounded-none" id="panelStage1">
+        
+        <!-- Background Photography -->
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 opacity-90" id="panelBg1" style="background-image: url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?q=80&w=1200&auto=format&fit=crop');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10"></div>
+
+        <!-- Top Static Bar -->
+        <div class="absolute top-0 inset-x-0 p-6 sm:p-8 flex items-center justify-between z-10">
+          <span class="text-xs font-mono font-bold tracking-widest text-gold-400 uppercase" id="panelTag1">
+            02 / SUB-FUND
+          </span>
+          <span class="text-xs font-mono text-slate-300" id="panelLocation1">
+            DHAKA, BD
+          </span>
+        </div>
+
+        <!-- Default Resting State (Bottom) -->
+        <div class="absolute inset-x-0 bottom-0 p-6 sm:p-8 z-10 space-y-4 transform transition-transform duration-500 group-hover:-translate-y-6">
+          <h3 class="text-2xl font-serif font-extrabold text-white leading-tight" id="panelTitle1">
+            Distress Asset Recovery Fund
+          </h3>
+          
+          <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/20 text-white font-mono">
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Raised</span>
+              <span class="text-base font-bold text-gold-400" id="panelRaised1">31%</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Target</span>
+              <span class="text-base font-bold text-white" id="panelTarget1">$600M</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Target IRR</span>
+              <span class="text-base font-bold text-gold-400" id="panelIrr1">21.0%</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs font-mono text-gold-400 opacity-80 group-hover:opacity-0 transition-opacity">
+            <i class="fa-solid fa-arrow-up text-[10px]"></i>
+            <span>Hover for details</span>
+          </div>
+        </div>
+
+        <!-- RISING CURTAIN: NEUTRAL BLUR LIGHT BLACK GLASS -->
+        <div class="absolute inset-x-0 bottom-0 bg-black/85 backdrop-blur-xl p-6 sm:p-8 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-20 border-t border-gold-500/40 rounded-none flex flex-col justify-between space-y-6">
+          
+          <div class="space-y-4">
+            <span class="text-[10px] font-mono font-extrabold text-gold-400 uppercase tracking-widest block" id="panelThesisTag1">
+              FUND THESIS & STRATEGY
+            </span>
+            <h4 class="text-2xl font-serif font-extrabold text-white leading-tight" id="panelCurtainTitle1">
+              mCapital Distress Asset Recovery Fund
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed font-normal" id="panelDesc1">
+              $300M NRB fund alongside $300M institutional capital for recapitalisation and turnaround of viable distressed industrial assets.
+            </p>
+
+            <div class="grid grid-cols-2 gap-3 py-3 border-t border-b border-white/15 text-xs font-mono">
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Min. Investment</span>
+                <span class="text-sm font-bold text-white" id="panelMin1">$5,000</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Target IRR</span>
+                <span class="text-sm font-bold text-gold-400" id="panelCurtainIrr1">21.0%</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Target Size</span>
+                <span class="text-sm font-bold text-white" id="panelCurtainTarget1">$600 Million</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase" id="panelGovTag1">Tenor</span>
+                <span class="text-sm font-bold text-white" id="panelGovVal1">4 – 6 Yrs Turnaround</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <a href="https://mcb-mock.vercel.app/opportunities/distress-asset-recovery-fund" target="_blank" class="btn-fill-left inline-flex items-center justify-between w-full px-6 py-3.5 rounded-full font-extrabold text-xs text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" id="panelBtn1" style="--fill-color: #042F2E;">
+              <span>Enter Dealroom</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ==================== COLUMN 04: POSITION 03 ==================== -->
+      <div class="relative h-[540px] sm:h-[580px] lg:h-[620px] overflow-hidden group cursor-pointer bg-slate-950 rounded-none" id="panelStage2">
+        
+        <!-- Background Photography -->
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105 opacity-90" id="panelBg2" style="background-image: url('https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?q=80&w=1200&auto=format&fit=crop');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10"></div>
+
+        <!-- Top Static Bar -->
+        <div class="absolute top-0 inset-x-0 p-6 sm:p-8 flex items-center justify-between z-10">
+          <span class="text-xs font-mono font-bold tracking-widest text-gold-400 uppercase" id="panelTag2">
+            03 / SUB-FUND
+          </span>
+          <span class="text-xs font-mono text-slate-300" id="panelLocation2">
+            DHAKA, BD
+          </span>
+        </div>
+
+        <!-- Default Resting State (Bottom) -->
+        <div class="absolute inset-x-0 bottom-0 p-6 sm:p-8 z-10 space-y-4 transform transition-transform duration-500 group-hover:-translate-y-6">
+          <h3 class="text-2xl font-serif font-extrabold text-white leading-tight" id="panelTitle2">
+            Healthcare Impact Fund
+          </h3>
+          
+          <div class="grid grid-cols-3 gap-2 pt-3 border-t border-white/20 text-white font-mono">
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Raised</span>
+              <span class="text-base font-bold text-gold-400" id="panelRaised2">55%</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Target</span>
+              <span class="text-base font-bold text-white" id="panelTarget2">$100M</span>
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-400 block uppercase">Target IRR</span>
+              <span class="text-base font-bold text-gold-400" id="panelIrr2">16.8%</span>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-xs font-mono text-gold-400 opacity-80 group-hover:opacity-0 transition-opacity">
+            <i class="fa-solid fa-arrow-up text-[10px]"></i>
+            <span>Hover for details</span>
+          </div>
+        </div>
+
+        <!-- RISING CURTAIN: NEUTRAL BLUR LIGHT BLACK GLASS -->
+        <div class="absolute inset-x-0 bottom-0 bg-black/85 backdrop-blur-xl p-6 sm:p-8 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] z-20 border-t border-gold-500/40 rounded-none flex flex-col justify-between space-y-6">
+          
+          <div class="space-y-4">
+            <span class="text-[10px] font-mono font-extrabold text-gold-400 uppercase tracking-widest block" id="panelThesisTag2">
+              FUND THESIS & STRATEGY
+            </span>
+            <h4 class="text-2xl font-serif font-extrabold text-white leading-tight" id="panelCurtainTitle2">
+              mCapital Healthcare Impact Fund
+            </h4>
+            <p class="text-xs text-slate-300 leading-relaxed font-normal" id="panelDesc2">
+              Hospitals, specialised tertiary care, diagnostics and digital health access infrastructure across Bangladesh.
+            </p>
+
+            <div class="grid grid-cols-2 gap-3 py-3 border-t border-b border-white/15 text-xs font-mono">
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Min. Investment</span>
+                <span class="text-sm font-bold text-white" id="panelMin2">$5,000</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Target IRR</span>
+                <span class="text-sm font-bold text-gold-400" id="panelCurtainIrr2">16.8%</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase">Target Size</span>
+                <span class="text-sm font-bold text-white" id="panelCurtainTarget2">$100 Million</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-400 block uppercase" id="panelGovTag2">Impact Sector</span>
+                <span class="text-sm font-bold text-cyan-400" id="panelGovVal2">Tertiary Health</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <a href="https://mcb-mock.vercel.app/opportunities/healthcare-impact-fund" target="_blank" class="btn-fill-left inline-flex items-center justify-between w-full px-6 py-3.5 rounded-full font-extrabold text-xs text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" id="panelBtn2" style="--fill-color: #042F2E;">
+              <span>Enter Dealroom</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- 5TH SECTION: HOW IT WORKS — CONNECTED MILESTONE CARDS (IMAGE 2 STANDARD) -->
+  <section class="w-full py-28 sm:py-36 bg-[#FBFBFA] text-slate-900 border-t border-slate-200/80 relative overflow-hidden" id="how-it-works">
+    
+    <!-- Topographic Background Wave Overlay (Top-Right Accent) -->
+    <div class="absolute right-0 top-0 w-1/2 h-full pointer-events-none opacity-25 overflow-hidden hidden lg:block">
+      <svg class="w-full h-full text-slate-300 stroke-current" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100,50 C300,100 450,250 600,200 M120,90 C320,140 470,290 600,240 M140,130 C340,180 490,330 600,280 M160,170 C360,220 510,370 600,320 M180,210 C380,260 530,410 600,360 M200,250 C400,300 550,450 600,400" stroke-width="1.2" stroke-linecap="round" />
+      </svg>
+    </div>
+
+    <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 space-y-16 sm:space-y-20 relative z-10">
+      
+      <!-- Stately Master Header -->
+      <div class="max-w-2xl space-y-3">
+        <div class="space-y-2">
+          <span class="text-xs font-mono font-extrabold text-gold-700 uppercase tracking-[0.25em] block">
+            HOW IT WORKS
+          </span>
+          <div class="w-12 h-1 bg-gold-600 rounded-full"></div>
+        </div>
+        
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-midnight leading-tight tracking-tight pt-2">
+          Investing globally,<br class="hidden sm:inline"> made simple.
+        </h2>
+        
+        <p class="text-slate-600 text-sm sm:text-base leading-relaxed font-normal pt-1">
+          We built the infrastructure so you can invest across borders with the transparency and rigor of institutional finance.
+        </p>
+      </div>
+
+      <!-- 4 Connected Milestone Cards Rail with Inter-Card Step Connectors -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-6 lg:gap-6 relative items-stretch" id="howItWorksMonolith">
+        
+        <!-- ==================== CARD 01 ==================== -->
+        <div class="how-it-works-panel relative rounded-2xl bg-white border border-slate-200/90 p-8 sm:p-9 shadow-sm hover:shadow-xl hover:border-gold-400/80 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+          
+          <!-- Top Floating Step Pill -->
+          <div class="absolute -top-4 left-10 px-3.5 py-1 rounded-full bg-white border border-gold-300 shadow-xs flex items-center justify-center">
+            <span class="text-xs font-mono font-extrabold text-gold-600">01</span>
+          </div>
+
+          <!-- Card Content Body -->
+          <div class="space-y-6 pt-2">
+            <!-- Dual-Tone Circular Icon Badge -->
+            <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-gold-600 group-hover:scale-110 group-hover:bg-amber-500/15 transition-all duration-300">
+              <svg class="w-8 h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <polyline points="16 11 18 13 22 9"></polyline>
               </svg>
+            </div>
+
+            <!-- Title & Narrative -->
+            <div class="space-y-3">
+              <h3 class="text-xl sm:text-2xl font-serif font-extrabold text-midnight group-hover:text-gold-700 transition-colors">
+                Create your account
+              </h3>
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                Join free in minutes and complete secure KYC verification with help from your nearest NRB Host.
+              </p>
+            </div>
+          </div>
+
+          <!-- Desktop Inter-Card Connecting Chevron Pill -->
+          <div class="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-400 items-center justify-center text-[10px] shadow-xs z-20 pointer-events-none group-hover:border-gold-400 group-hover:text-gold-600 transition-colors">
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+
+        </div>
+
+        <!-- ==================== CARD 02 ==================== -->
+        <div class="how-it-works-panel relative rounded-2xl bg-white border border-slate-200/90 p-8 sm:p-9 shadow-sm hover:shadow-xl hover:border-emerald-400/80 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+          
+          <!-- Top Floating Step Pill -->
+          <div class="absolute -top-4 left-10 px-3.5 py-1 rounded-full bg-white border border-emerald-300 shadow-xs flex items-center justify-center">
+            <span class="text-xs font-mono font-extrabold text-emerald-600">02</span>
+          </div>
+
+          <!-- Card Content Body -->
+          <div class="space-y-6 pt-2">
+            <!-- Dual-Tone Circular Icon Badge -->
+            <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 group-hover:scale-110 group-hover:bg-emerald-500/15 transition-all duration-300">
+              <svg class="w-8 h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <line x1="11" y1="8" x2="11" y2="14"></line>
+                <line x1="8" y1="11" x2="8" y2="14"></line>
+                <line x1="14" y1="11" x2="14" y2="14"></line>
+              </svg>
+            </div>
+
+            <!-- Title & Narrative -->
+            <div class="space-y-3">
+              <h3 class="text-xl sm:text-2xl font-serif font-extrabold text-midnight group-hover:text-emerald-700 transition-colors">
+                Explore opportunities
+              </h3>
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                Browse curated Funds and Investments with full disclosures, sponsor details, and independent due diligence.
+              </p>
+            </div>
+          </div>
+
+          <!-- Desktop Inter-Card Connecting Chevron Pill -->
+          <div class="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-400 items-center justify-center text-[10px] shadow-xs z-20 pointer-events-none group-hover:border-emerald-400 group-hover:text-emerald-600 transition-colors">
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+
+        </div>
+
+        <!-- ==================== CARD 03 ==================== -->
+        <div class="how-it-works-panel relative rounded-2xl bg-white border border-slate-200/90 p-8 sm:p-9 shadow-sm hover:shadow-xl hover:border-gold-400/80 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+          
+          <!-- Top Floating Step Pill -->
+          <div class="absolute -top-4 left-10 px-3.5 py-1 rounded-full bg-white border border-gold-300 shadow-xs flex items-center justify-center">
+            <span class="text-xs font-mono font-extrabold text-gold-600">03</span>
+          </div>
+
+          <!-- Card Content Body -->
+          <div class="space-y-6 pt-2">
+            <!-- Dual-Tone Circular Icon Badge -->
+            <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-gold-600 group-hover:scale-110 group-hover:bg-amber-500/15 transition-all duration-300">
+              <svg class="w-8 h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+
+            <!-- Title & Narrative -->
+            <div class="space-y-3">
+              <h3 class="text-xl sm:text-2xl font-serif font-extrabold text-midnight group-hover:text-gold-700 transition-colors">
+                Invest with confidence
+              </h3>
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                Commit capital through escrow-backed, milestone-based structures with transparent terms and minimums.
+              </p>
+            </div>
+          </div>
+
+          <!-- Desktop Inter-Card Connecting Chevron Pill -->
+          <div class="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white border border-slate-200 text-slate-400 items-center justify-center text-[10px] shadow-xs z-20 pointer-events-none group-hover:border-gold-400 group-hover:text-gold-600 transition-colors">
+            <i class="fa-solid fa-chevron-right"></i>
+          </div>
+
+        </div>
+
+        <!-- ==================== CARD 04 ==================== -->
+        <div class="how-it-works-panel relative rounded-2xl bg-white border border-slate-200/90 p-8 sm:p-9 shadow-sm hover:shadow-xl hover:border-emerald-400/80 transition-all duration-300 flex flex-col justify-between space-y-6 group">
+          
+          <!-- Top Floating Step Pill -->
+          <div class="absolute -top-4 left-10 px-3.5 py-1 rounded-full bg-white border border-emerald-300 shadow-xs flex items-center justify-center">
+            <span class="text-xs font-mono font-extrabold text-emerald-600">04</span>
+          </div>
+
+          <!-- Card Content Body -->
+          <div class="space-y-6 pt-2">
+            <!-- Dual-Tone Circular Icon Badge -->
+            <div class="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 group-hover:scale-110 group-hover:bg-emerald-500/15 transition-all duration-300">
+              <svg class="w-8 h-8 stroke-current" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+                <path d="M7 10l2 2 4-4"></path>
+              </svg>
+            </div>
+
+            <!-- Title & Narrative -->
+            <div class="space-y-3">
+              <h3 class="text-xl sm:text-2xl font-serif font-extrabold text-midnight group-hover:text-emerald-700 transition-colors">
+                Track performance
+              </h3>
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal">
+                Monitor commitments, capital calls, distributions, IRR and MOIC from a single institutional dashboard.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- 6TH SECTION: NRB HOSTS & GLOBAL HUBS — SOVEREIGN WORLD MAP STAGE -->
+  <section class="w-full py-24 sm:py-32 bg-midnight text-white relative border-t border-white/10" id="global-hubs">
+
+    <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 relative z-10 space-y-12">
+      
+      <!-- SECTION HEADER: EDITORIAL STATS & CALL TO ACTION -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-end">
+        
+        <!-- Left: Editorial Narrative -->
+        <div class="lg:col-span-7 space-y-4">
+          <span class="text-xs font-mono font-extrabold text-gold-400 uppercase tracking-[0.3em] block">
+            NRB HOSTS & GLOBAL HUBS
+          </span>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold text-white leading-tight tracking-tight">
+            A trusted presence in 30 countries.
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed font-normal max-w-2xl">
+            Our growing network of 100 global hubs, run by local NRB Hosts, brings <span class="text-white font-semibold">mCapital</span> closer to the diaspora — offering guidance, onboarding, and a human touch wherever you are.
+          </p>
+        </div>
+
+        <!-- Right: Glass KPI Metrics & Action Button -->
+        <div class="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end justify-between gap-6">
+          
+          <!-- Unified KPI Glass Monolith -->
+          <div class="grid grid-cols-3 divide-x divide-white/15 w-full max-w-md rounded-2xl bg-white/[0.04] border border-white/15 p-1 shadow-inner">
+            <div class="py-3.5 px-2 text-center">
+              <span class="text-2xl sm:text-3xl font-serif font-extrabold text-white block">100</span>
+              <span class="text-[10px] font-sans font-bold text-slate-400 uppercase tracking-wider block mt-0.5">Global hubs</span>
+            </div>
+            <div class="py-3.5 px-2 text-center">
+              <span class="text-2xl sm:text-3xl font-serif font-extrabold text-white block">30</span>
+              <span class="text-[10px] font-sans font-bold text-slate-400 uppercase tracking-wider block mt-0.5">Countries</span>
+            </div>
+            <div class="py-3.5 px-2 text-center">
+              <span class="text-2xl sm:text-3xl font-serif font-extrabold text-gold-400 block">24/7</span>
+              <span class="text-[10px] font-sans font-bold text-slate-400 uppercase tracking-wider block mt-0.5">Local support</span>
+            </div>
+          </div>
+
+          <!-- CTA Button -->
+          <div>
+            <a href="https://mcb-mock.vercel.app/investors/hubs" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-xs sm:text-sm text-midnight bg-white hover:text-white border border-white shadow-lg transition-all" style="--fill-color: #D97706;">
+              <span>Find a hub near you</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- INTERACTIVE MAP STAGE CARD -->
+      <div class="w-full rounded-2xl bg-white/[0.03] border border-white/15 overflow-hidden shadow-2xl relative p-5 sm:p-8 lg:p-10">
+        
+        <!-- Region Filter Chips -->
+        <div class="flex items-center justify-between flex-wrap gap-3 pb-6 border-b border-white/10 relative z-20">
+          <div class="flex items-center gap-2 flex-wrap" id="hubRegionFilters">
+            <button class="hub-filter-chip active px-4 py-1.5 rounded-full text-xs font-sans font-bold bg-gold-600 text-white shadow-xs transition-all tracking-wide" data-region="all">
+              All Hubs (100)
+            </button>
+            <button class="hub-filter-chip px-4 py-1.5 rounded-full text-xs font-sans font-bold bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-all tracking-wide" data-region="middle-east">
+              Middle East (38)
+            </button>
+            <button class="hub-filter-chip px-4 py-1.5 rounded-full text-xs font-sans font-bold bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-all tracking-wide" data-region="europe">
+              Europe (28)
+            </button>
+            <button class="hub-filter-chip px-4 py-1.5 rounded-full text-xs font-sans font-bold bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-all tracking-wide" data-region="north-america">
+              North America (22)
+            </button>
+            <button class="hub-filter-chip px-4 py-1.5 rounded-full text-xs font-sans font-bold bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white border border-white/10 transition-all tracking-wide" data-region="asia-pacific">
+              Asia Pacific (12)
+            </button>
+          </div>
+
+          <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-300">
+            <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i>
+            <span>Real-time Diaspora Network</span>
           </div>
         </div>
 
-        <!-- Column 3: Platform Links -->
-        <div>
-          <h4 class="text-xs font-mono font-bold tracking-widest text-slate-400 uppercase mb-6">Platform</h4>
-          <ul class="space-y-3.5 text-sm text-slate-300 font-medium">
-            <li><a href="https://www.mcapitalbd.com/#services" class="hover:text-accentLime transition-colors">mCapital
-                Services</a></li>
-            <li><a href="https://www.mcapitalbd.com/#focus" class="hover:text-accentLime transition-colors">Investment
-                segments</a></li>
-            <li><a href="https://www.mcapitalbd.com/#why-bangladesh" class="hover:text-accentLime transition-colors">Why
-                Bangladesh</a></li>
-            <li><a href="https://www.mcapitalbd.com/#network" class="hover:text-accentLime transition-colors">NRB
-                Network</a>
-            </li>
-            <li><a href="https://www.mcapitalbd.com/#impact" class="hover:text-accentLime transition-colors">Our
-                Impact</a>
-            </li>
-            <li><a href="https://www.mcapitalbd.com/#hubs" class="hover:text-accentLime transition-colors">NRB Hubs</a>
-            </li>
-            <li><a href="https://www.mcapitalbd.com/login" class="hover:text-accentLime transition-colors">Portfolio
-                (Members)</a></li>
-          </ul>
+        <!-- THE MAP CONTAINER POWERED BY JSVECTORMAP LIBRARY -->
+        <div class="relative w-full min-h-[460px] sm:min-h-[540px] lg:min-h-[580px] my-4 flex items-center justify-center overflow-hidden rounded-xl bg-black/40 border border-white/10" id="worldMapStage">
+          
+          <!-- Library Canvas Container -->
+          <div id="jvmWorldMap" class="w-full h-full min-h-[460px] sm:min-h-[540px] lg:min-h-[580px]"></div>
+
+          <!-- DYNAMIC HOVER TOOLTIP CARD -->
+          <div id="hubTooltipCard" class="absolute pointer-events-none opacity-0 translate-y-2 transition-all duration-300 z-30 bg-black/95 backdrop-blur-xl p-4 rounded-xl border border-gold-500/40 shadow-2xl w-64 text-left space-y-2">
+            <div class="flex items-center justify-between border-b border-white/10 pb-2">
+              <span id="tooltipCity" class="text-sm font-serif font-extrabold text-white">London Hub</span>
+              <span id="tooltipCountry" class="text-[10px] font-mono text-gold-400 uppercase">United Kingdom</span>
+            </div>
+            <div class="space-y-1 text-xs font-mono">
+              <div class="text-slate-300">
+                <span class="text-slate-500 text-[10px] block uppercase">Local NRB Host</span>
+                <span id="tooltipHost" class="font-bold text-white">Dr. Farhan Ahmed</span>
+              </div>
+              <div class="text-slate-300 pt-1">
+                <span class="text-slate-500 text-[10px] block uppercase">Active Diaspora Capital</span>
+                <span id="tooltipInvestors" class="font-bold text-emerald-400">1,840+ Investors</span>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Column 4: Members Links -->
-        <div>
-          <h4 class="text-xs font-mono font-bold tracking-widest text-slate-400 uppercase mb-6">Members</h4>
-          <ul class="space-y-3.5 text-sm text-slate-300 font-medium">
-            <li><a href="https://www.mcapitalbd.com/join-mcapital"
-                class="hover:text-accentLime transition-colors">Become a
-                mCapital Member</a></li>
-            <li><a href="https://www.mcapitalbd.com/join-mcapital"
-                class="hover:text-accentLime transition-colors">Founders
-                &amp; Sponsors Circle</a></li>
-            <li><a href="https://www.mcapitalbd.com/join-mcapital" class="hover:text-accentLime transition-colors">Apply
-                as
-                NRB Host</a></li>
-            <li><a href="https://www.mcapitalbd.com/#members" class="hover:text-accentLime transition-colors">How to
-                engage</a></li>
-            <li><a href="https://www.mcapitalbd.com/login" class="hover:text-accentLime transition-colors">Sign in</a>
-            </li>
-          </ul>
+        <!-- BOTTOM MAP LEGEND & FOOTNOTE -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10 text-xs font-mono text-slate-400 relative z-20">
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-red-500 border border-white inline-block"></span>
+              <span class="text-white font-bold">Headquarters (Dhaka)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-white inline-block"></span>
+              <span>Global NRB Hub</span>
+            </div>
+          </div>
+
+          <div>
+            <span>Click any country to explore diaspora hubs · 30 countries</span>
+          </div>
         </div>
 
-        <!-- Column 5: Company Links -->
-        <div>
-          <h4 class="text-xs font-mono font-bold tracking-widest text-slate-400 uppercase mb-6">Company</h4>
-          <ul class="space-y-3.5 text-sm text-slate-300 font-medium">
-            <li><a href="https://www.mcapitalbd.com/about" class="hover:text-accentLime transition-colors">About us</a>
-            </li>
-            <li><a href="https://www.mcapitalbd.com/#contact"
-                class="hover:text-accentLime transition-colors">Contact</a>
-            </li>
-            <li><a href="https://www.mcapitalbd.com/#" class="hover:text-accentLime transition-colors">Privacy</a></li>
-            <li><a href="https://www.mcapitalbd.com/#" class="hover:text-accentLime transition-colors">Terms</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <!-- Bottom Copyright Bar -->
-      <div
-        class="flex flex-col sm:flex-row justify-between items-center pt-8 text-xs font-semibold tracking-wider text-slate-400 uppercase gap-4">
-        <span>&copy; 2026 mCapital Global LLC, USA. All rights reserved.</span>
-        <div class="flex items-center gap-6">
-          <span>BSEC Regulated</span>
-          <span>FERA Remittance Compliant</span>
-        </div>
       </div>
 
     </div>
-  </footer>
 
-  <!-- Quick Search Drawer Overlay -->
-  <div
-    class="modal-overlay fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
-    id="searchOverlay" role="dialog" aria-modal="true" aria-labelledby="searchModalTitle">
-    <div class="bg-white rounded-3xl max-w-xl w-11/12 p-8 relative shadow-2xl">
-      <button class="modal-close absolute top-6 right-6 text-2xl text-slate-400 hover:text-slate-900"
-        id="searchCloseBtn" aria-label="Close search">&times;</button>
-      <h3 id="searchModalTitle" class="text-xl font-extrabold text-brandNavy mb-1">Institutional Deal Search</h3>
-      <p class="text-xs text-slate-500 mb-4">Enter ticker symbol, sector, or keyword (e.g., Healthcare, Solar, Terminal,
-        London):</p>
+  </section>
 
-      <div class="relative mb-6">
-        <input type="text" id="searchInput" placeholder="Search prospectus deals..."
-          class="w-full px-5 py-3.5 rounded-2xl bg-slate-100 border border-slate-200 text-sm font-semibold text-brandNavy focus:outline-none focus:ring-2 focus:ring-brandTeal">
-      </div>
-
-      <div id="searchResults" class="min-h-[120px]">
-        <span class="text-xs text-slate-400">Type a keyword to filter deal prospectuses...</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Opportunity Modal Drawer -->
-  <div
-    class="modal-overlay fixed inset-0 bg-black/80 backdrop-blur-md z-[1000] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300"
-    id="oppModalOverlay" role="dialog" aria-modal="true" aria-labelledby="prospectusModalTitle">
-    <div class="bg-white rounded-3xl max-w-xl w-11/12 max-h-[85vh] overflow-y-auto p-8 relative shadow-2xl">
-      <button class="modal-close absolute top-6 right-6 text-2xl text-slate-400 hover:text-slate-900" id="modalCloseBtn"
-        aria-label="Close modal">&times;</button>
-      <div class="modal-body" id="modalContent"></div>
-    </div>
-  </div>
-
+  <!-- GSAP 3.12 CDN & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <!-- jsVectorMap Library & World Map CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/js/jsvectormap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsvectormap/dist/maps/world.js"></script>
+  <!-- Studio Freight Lenis Smooth Momentum Scrolling -->
+  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+  <!-- Application JS -->
   <script src="js/app.js"></script>
-
 </body>
-
 </html>
