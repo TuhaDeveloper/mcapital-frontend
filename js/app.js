@@ -534,7 +534,7 @@ function initGSAPNavBorderHover() {
         overwrite: 'auto'
       });
       gsap.to(link, {
-        color: '#FBBF24',
+        color: '#FFFFFF',
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         duration: 0.25
       });
@@ -542,23 +542,27 @@ function initGSAPNavBorderHover() {
 
     link.addEventListener('mouseleave', () => {
       const len = link.dataset.pathLength || 360;
-      gsap.to(rect, {
-        strokeDashoffset: len,
-        duration: 0.35,
-        ease: 'power2.in',
-        overwrite: 'auto'
-      });
-
       if (link !== activeLink) {
+        gsap.to(rect, {
+          strokeDashoffset: len,
+          duration: 0.35,
+          ease: 'power2.in',
+          overwrite: 'auto'
+        });
         gsap.to(link, {
-          color: 'rgba(255, 255, 255, 0.9)',
+          color: 'rgba(255, 255, 255, 0.85)',
           backgroundColor: 'transparent',
           duration: 0.25
         });
       } else {
+        gsap.to(rect, {
+          strokeDashoffset: 0,
+          duration: 0.25,
+          overwrite: 'auto'
+        });
         gsap.to(link, {
-          color: '#FBBF24',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          color: '#FFFFFF',
+          backgroundColor: 'rgba(255, 255, 255, 0.12)',
           duration: 0.25
         });
       }
@@ -585,9 +589,17 @@ function initGSAPNavBorderHover() {
   function setActiveLink(link) {
     if (!link) return;
     link.classList.add('active-nav');
+    const rect = link.querySelector('.nav-border-rect');
+    if (rect) {
+      gsap.to(rect, {
+        strokeDashoffset: 0,
+        duration: 0.4,
+        ease: 'power2.out'
+      });
+    }
     gsap.to(link, {
-      color: '#FBBF24',
-      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#FFFFFF',
+      backgroundColor: 'rgba(255, 255, 255, 0.12)',
       duration: 0.3
     });
   }
@@ -607,7 +619,7 @@ function initGSAPNavBorderHover() {
     }
 
     gsap.to(link, {
-      color: 'rgba(255, 255, 255, 0.9)',
+      color: 'rgba(255, 255, 255, 0.85)',
       backgroundColor: 'transparent',
       duration: 0.3
     });
