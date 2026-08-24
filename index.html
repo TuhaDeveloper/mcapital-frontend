@@ -9,7 +9,7 @@
   <!-- Google Fonts: Playfair Display for Luxury Serif Headlines + Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
   
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -25,22 +25,24 @@
         extend: {
           colors: {
             midnight: {
-              DEFAULT: '#042F2E', // Deep Royal Forest Emerald
-              800: '#065F46',     // Rich Emerald
-              900: '#042F2E',     // Deepest Forest Emerald
-              950: '#022C22',     // Darkest Emerald Shadow
+              DEFAULT: '#0E1C2F', // Sovereign Corporate Midnight Navy
+              800: '#182E4B',     // Lighter Midnight Accent
+              900: '#0E1C2F',     // Core Brand Sovereign Navy
+              950: '#081220',     // Darkest Monolith Depth
             },
             gold: {
-              400: '#FBBF24',
-              500: '#F59E0B',
-              600: '#D97706',     // Champagne Gold
-              700: '#B45309',
+              300: '#E6D49C',
+              400: '#D8C074',
+              500: '#C8A84B',     // Refined Gold Accent
+              600: '#C8A84B',     // Refined Gold Primary
+              700: '#A88C35',
+              800: '#897023',
             }
           },
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            serif: ['Playfair Display', 'serif'],
-            heading: ['Outfit', 'sans-serif'],
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            serif: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+            heading: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
           }
         }
       }
@@ -76,7 +78,7 @@
       left: 0;
       width: 0%;
       height: 100%;
-      background-color: var(--fill-color, #D97706);
+      background-color: var(--fill-color, #C8A84B);
       transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
       z-index: -1;
       border-radius: inherit;
@@ -181,10 +183,7 @@
         <div class="w-9 h-9 rounded-xl bg-gold-600 text-white flex items-center justify-center font-black text-xl font-heading shadow-md shadow-gold-600/30 border border-gold-400/40 group-hover:scale-105 transition-transform duration-300">
           m
         </div>
-        <div class="flex flex-col">
-          <span class="font-heading font-extrabold text-2xl text-white tracking-tight leading-none group-hover:text-gold-400 transition-colors duration-300">mCapital</span>
-          <span class="text-[10px] font-bold text-gold-400 tracking-wider uppercase mt-0.5">Investment Platform</span>
-        </div>
+        <span class="font-heading font-extrabold text-2xl text-white tracking-tight leading-none group-hover:text-gold-400 transition-colors duration-300">mCapital</span>
       </a>
 
       <!-- CENTER: NAVIGATION LINKS WITH GSAP BORDER DRAWING & HOVER UX -->
@@ -194,7 +193,7 @@
         <div class="relative group">
           <a href="#about" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full" data-nav="about">
             <svg class="nav-border-svg">
-              <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+              <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#C8A84B" stroke-width="1.2" />
             </svg>
             <span class="relative z-10 flex items-center gap-1.5">
               About Us
@@ -219,28 +218,28 @@
           </div>
         </div>
 
-        <!-- Nav Link 2: Opportunities -->
-        <a href="#opportunities" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full group" data-nav="opportunities">
+        <!-- Nav Link 2: Ways to Invest -->
+        <a href="#ways-to-invest" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 rounded-full" data-nav="ways">
           <svg class="nav-border-svg">
-            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#C8A84B" stroke-width="1.2" />
           </svg>
-          <span class="relative z-10">Opportunities</span>
+          <span class="relative z-10">Ways to Invest</span>
         </a>
 
-        <!-- Nav Link 3: Investor Relations -->
-        <a href="#investor-relations" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full group" data-nav="investor-relations">
+        <!-- Nav Link 3: Live Opportunities -->
+        <a href="#live-funds" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 rounded-full" data-nav="opportunities">
           <svg class="nav-border-svg">
-            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#C8A84B" stroke-width="1.2" />
           </svg>
-          <span class="relative z-10">Investor Relations</span>
+          <span class="relative z-10">Live Opportunities</span>
         </a>
 
-        <!-- Nav Link 4: Impact -->
-        <a href="#impact" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 flex items-center gap-1.5 rounded-full group" data-nav="impact">
+        <!-- Nav Link 4: Global Hubs -->
+        <a href="#global-hubs" class="nav-link relative px-5 py-2.5 text-sm font-semibold text-white/90 hover:text-gold-400 transition-colors duration-200 rounded-full" data-nav="hubs">
           <svg class="nav-border-svg">
-            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#D97706" stroke-width="1.2" />
+            <rect class="nav-border-rect" x="0" y="0" width="100%" height="100%" rx="20" fill="none" stroke="#C8A84B" stroke-width="1.2" />
           </svg>
-          <span class="relative z-10">Impact</span>
+          <span class="relative z-10">Global Hubs</span>
         </a>
 
       </div>
@@ -253,7 +252,7 @@
         </a>
 
         <!-- Primary Action Button: Start Investing -->
-        <a href="#start-investing" class="btn-fill-left px-6 py-2.5 rounded-full font-bold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/40 shadow-md shadow-gold-600/20" style="--fill-color: #042F2E;">
+        <a href="#start-investing" class="btn-fill-left px-6 py-2.5 rounded-full font-bold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/40 shadow-md shadow-gold-600/20" style="--fill-color: #0E1C2F;">
           Start Investing
         </a>
       </div>
@@ -313,7 +312,7 @@
             </span>
           </a>
           
-          <a href="#opportunities" class="btn-fill-left px-6 py-3 bg-white/10 hover:text-white text-white font-bold text-sm rounded-full backdrop-blur-md border border-white/20 transition-all duration-300" style="--fill-color: #D97706;">
+          <a href="#opportunities" class="btn-fill-left px-6 py-3 bg-white/10 hover:text-white text-white font-bold text-sm rounded-full backdrop-blur-md border border-white/20 transition-all duration-300" style="--fill-color: #C8A84B;">
             Explore Opportunities
           </a>
         </div>
@@ -448,7 +447,7 @@
 
             <!-- Action Button: Ultra-Crisp White Text on Gold Pill Button -->
             <div class="pt-2">
-              <a href="#about" class="btn-fill-left inline-flex items-center gap-3 px-6 py-3 rounded-full font-extrabold text-xs text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/30" style="--fill-color: #042F2E;">
+              <a href="#about" class="btn-fill-left inline-flex items-center gap-3 px-6 py-3 rounded-full font-extrabold text-xs text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/30" style="--fill-color: #0E1C2F;">
                 <span>More About Governance</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
               </a>
@@ -527,7 +526,7 @@
 
           <!-- CLEAN SINGLE ACTION BUTTON -->
           <div class="pt-2">
-            <a href="#opportunities" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" style="--fill-color: #042F2E;">
+            <a href="#opportunities" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" style="--fill-color: #0E1C2F;">
               <span>Explore Opportunities</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
@@ -614,7 +613,7 @@
 
           <!-- Action CTA Button -->
           <div class="pt-4 relative z-10">
-            <a href="https://mcb-mock.vercel.app/investors/funds" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" style="--fill-color: #022C22;">
+            <a href="https://mcb-mock.vercel.app/investors/funds" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-gold-600 hover:text-white border border-gold-400/50 shadow-md shadow-gold-600/25 transition-all" style="--fill-color: #0E1C2F;">
               <span>Explore Funds</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
@@ -667,7 +666,7 @@
 
           <!-- Action CTA Button -->
           <div class="pt-4 relative z-10">
-            <a href="https://mcb-mock.vercel.app/investors/direct-investments" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-midnight hover:text-white border border-midnight shadow-md shadow-midnight/20 transition-all" style="--fill-color: #D97706;">
+            <a href="https://mcb-mock.vercel.app/investors/direct-investments" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-sm text-white bg-midnight hover:text-white border border-midnight shadow-md shadow-midnight/20 transition-all" style="--fill-color: #C8A84B;">
               <span>Browse Investments</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
@@ -717,7 +716,7 @@
 
         <!-- Bottom Link Action (Consistent Signature Button) -->
         <div class="pt-4 border-t border-white/10">
-          <a href="https://mcb-mock.vercel.app/investors/funds" target="_blank" class="btn-fill-left inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/10 hover:text-white text-white font-extrabold text-xs border border-white/20 shadow-xs transition-all" id="monolithDeckLink" style="--fill-color: #D97706;">
+          <a href="https://mcb-mock.vercel.app/investors/funds" target="_blank" class="btn-fill-left inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white/10 hover:text-white text-white font-extrabold text-xs border border-white/20 shadow-xs transition-all" id="monolithDeckLink" style="--fill-color: #C8A84B;">
             <span>View all opportunities</span>
             <i class="fa-solid fa-arrow-right text-[10px]"></i>
           </a>
@@ -1223,7 +1222,7 @@
 
           <!-- CTA Button -->
           <div>
-            <a href="https://mcb-mock.vercel.app/investors/hubs" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-xs sm:text-sm text-midnight bg-white hover:text-white border border-white shadow-lg transition-all" style="--fill-color: #D97706;">
+            <a href="https://mcb-mock.vercel.app/investors/hubs" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-3.5 rounded-full font-extrabold text-xs sm:text-sm text-midnight bg-white hover:text-white border border-white shadow-lg transition-all" style="--fill-color: #0E1C2F;">
               <span>Find a hub near you</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
@@ -1339,7 +1338,7 @@
 
           <!-- Dual Button Action Group -->
           <div class="flex flex-wrap items-center gap-4 pt-2">
-            <a href="https://mcb-mock.vercel.app/#" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-4 rounded-full bg-midnight hover:text-white text-white font-extrabold text-sm shadow-xl shadow-midnight/20 transition-all duration-300" style="--fill-color: #D97706;">
+            <a href="https://mcb-mock.vercel.app/#" target="_blank" class="btn-fill-left inline-flex items-center gap-3 px-8 py-4 rounded-full bg-midnight hover:text-white text-white font-extrabold text-sm shadow-xl shadow-midnight/20 transition-all duration-300" style="--fill-color: #C8A84B;">
               <span>Create your account</span>
               <i class="fa-solid fa-arrow-right text-xs"></i>
             </a>
@@ -1357,12 +1356,12 @@
 
         </div>
 
-        <!-- Right: Modern Panoramic Metric Stage (Pure Institutional Architecture - No AI Icons) -->
+        <!-- Right: Modern Panoramic Metric Stage (Pure Sovereign Navy & Refined Gold Palette) -->
         <div class="lg:col-span-6">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
             
             <!-- Metric 01: AUM -->
-            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-gold-400/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
+            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-gold-500/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
               <div class="border-l-2 border-gold-600 pl-3">
                 <span class="text-[11px] font-mono font-extrabold text-gold-700 uppercase tracking-widest block">
                   CAPITAL VOLUME
@@ -1378,23 +1377,23 @@
             </div>
 
             <!-- Metric 02: IRR -->
-            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-emerald-400/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
-              <div class="border-l-2 border-emerald-600 pl-3">
-                <span class="text-[11px] font-mono font-extrabold text-emerald-700 uppercase tracking-widest block">
+            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-gold-500/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
+              <div class="border-l-2 border-gold-600 pl-3">
+                <span class="text-[11px] font-mono font-extrabold text-gold-700 uppercase tracking-widest block">
                   HISTORICAL RETURN
                 </span>
               </div>
-              <span class="text-4xl sm:text-5xl font-serif font-extrabold text-emerald-700 block leading-none">
+              <span class="text-4xl sm:text-5xl font-serif font-extrabold text-gold-600 block leading-none">
                 24.5%
               </span>
               <span class="text-xs text-slate-500 font-sans font-semibold block pt-1">
                 Average net IRR
               </span>
-              <div class="absolute bottom-0 left-0 right-0 h-1 bg-transparent group-hover:bg-emerald-500 transition-all duration-300"></div>
+              <div class="absolute bottom-0 left-0 right-0 h-1 bg-transparent group-hover:bg-gold-500 transition-all duration-300"></div>
             </div>
 
             <!-- Metric 03: Investors -->
-            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-gold-400/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
+            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-gold-500/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
               <div class="border-l-2 border-gold-600 pl-3">
                 <span class="text-[11px] font-mono font-extrabold text-gold-700 uppercase tracking-widest block">
                   COMMUNITY
@@ -1410,9 +1409,9 @@
             </div>
 
             <!-- Metric 04: Countries -->
-            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-emerald-400/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
-              <div class="border-l-2 border-emerald-600 pl-3">
-                <span class="text-[11px] font-mono font-extrabold text-emerald-700 uppercase tracking-widest block">
+            <div class="p-8 sm:p-9 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-gold-500/80 transition-all duration-300 space-y-4 group relative overflow-hidden">
+              <div class="border-l-2 border-gold-600 pl-3">
+                <span class="text-[11px] font-mono font-extrabold text-gold-700 uppercase tracking-widest block">
                   GLOBAL NETWORK
                 </span>
               </div>
@@ -1422,7 +1421,7 @@
               <span class="text-xs text-slate-500 font-sans font-semibold block pt-1">
                 Countries served
               </span>
-              <div class="absolute bottom-0 left-0 right-0 h-1 bg-transparent group-hover:bg-emerald-500 transition-all duration-300"></div>
+              <div class="absolute bottom-0 left-0 right-0 h-1 bg-transparent group-hover:bg-gold-500 transition-all duration-300"></div>
             </div>
 
           </div>
@@ -1435,7 +1434,7 @@
   </section>
 
   <!-- 8TH SECTION: MASTER INSTITUTIONAL FOOTER -->
-  <footer class="w-full bg-[#021B19] text-slate-400 border-t border-white/10 pt-20 pb-12 relative overflow-hidden" id="main-footer">
+  <footer class="w-full bg-[#0E1C2F] text-slate-400 border-t border-white/10 pt-20 pb-12 relative overflow-hidden" id="main-footer">
     
     <div class="w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 space-y-16 relative z-10">
       

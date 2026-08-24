@@ -1362,16 +1362,16 @@ function initGlobalHubsMap() {
         zoomOnScroll: false,
         regionStyle: {
           initial: {
-            fill: '#083E3A',
+            fill: '#132338',
             fillOpacity: 1,
-            stroke: '#10B981',
+            stroke: 'rgba(200, 168, 75, 0.4)',
             strokeWidth: 0.8,
             strokeOpacity: 0.9
           },
           hover: {
-            fill: '#0E5C56',
+            fill: '#1A3353',
             fillOpacity: 1,
-            stroke: '#34D399',
+            stroke: '#C8A84B',
             strokeWidth: 1.4,
             cursor: 'pointer'
           }
@@ -1379,6 +1379,8 @@ function initGlobalHubsMap() {
         markers: markers,
         lines: lines,
         lineStyle: {
+          stroke: 'rgba(200, 168, 75, 0.85)',
+          strokeWidth: 1.6,
           animation: true
         },
         markerTooltip: false,

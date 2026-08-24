@@ -1,21 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --primary-blue: #0066FF;
-  --primary-dark: #0A192F;
-  --accent-cyan: #06B6D4;
-  --accent-gold: #F59E0B;
+  --primary-dark: #0E1C2F;
+  --accent-gold: #C8A84B;
+  --fill-color: #C8A84B;
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #F8FAFC;
   color: #0F172A;
   overflow-x: hidden;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 h1, h2, h3, .font-heading {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Glassmorphism & Modern UI utilities */
