@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   initGSAPMagneticButtons();
   initActivitiesBentoAnimations();
   initGoalDiscoveryPhysics();
-  initWaysToInvestAnimations();
   initMonolithDealToggle();
   initWorkflowStepperScroll();
+  initPlatformRolesSwitcher();
   initGlobalHubsMap();
   initLeaderSlider();
   initGlobalScrollTypographyMotion();
@@ -1518,14 +1518,112 @@ function initGlobalHubsMap() {
 }
 
 /* -------------------------------------------------------------
- * 10. HOW IT WORKS — ARCHITECTURAL MONOLITH MOTION (GSAP)
+ * 11. THE MCAPITAL PLATFORM — 4 POWERFUL ROLES INTERACTIVE SWITCHER
+ * ------------------------------------------------------------- */
+const roleData = [
+  {
+    indexLabel: '01 / 04',
+    badge: '01 · Project Sponsor',
+    title: 'Project Sponsor',
+    subtitle: 'Growth Driver, Business Owner, Entrepreneurs',
+    description: 'Create projects, raise capital, manage dataroom',
+    ctaText: 'Explore Role',
+    ctaUrl: 'https://mcb-mock.vercel.app/#'
+  },
+  {
+    indexLabel: '02 / 04',
+    badge: '02 · Fund Manager',
+    title: 'Fund Manager',
+    subtitle: 'Capital Management',
+    description: 'Fund operations, investor relations, portfolio management',
+    ctaText: 'Explore Role',
+    ctaUrl: 'https://mcb-mock.vercel.app/#'
+  },
+  {
+    indexLabel: '03 / 04',
+    badge: '03 · NRB Host',
+    title: 'NRB Host',
+    subtitle: 'Local Leadership, Community Builder',
+    description: 'Geographic hub management, member growth, local events',
+    ctaText: 'Explore Role',
+    ctaUrl: 'https://mcb-mock.vercel.app/#'
+  },
+  {
+    indexLabel: '04 / 04',
+    badge: '04 · NRB Investor',
+    title: 'NRB Investor',
+    subtitle: 'Opportunity Access',
+    description: 'Browse projects, commit capital, community engagement',
+    ctaText: 'Explore Role',
+    ctaUrl: 'https://mcb-mock.vercel.app/#'
+  }
+];
+
+window.switchPlatformRole = function(idx) {
+  const tabsList = document.getElementById('roleTabsList');
+  const detailStage = document.getElementById('roleDetailStage');
+  if (!tabsList || !detailStage) return;
+
+  const tabButtons = tabsList.querySelectorAll('.role-tab-btn');
+  const roleBadge = document.getElementById('roleBadge');
+  const roleIndexLabel = document.getElementById('roleIndexLabel');
+  const roleTitle = document.getElementById('roleTitle');
+  const roleSubtitle = document.getElementById('roleSubtitle');
+  const roleDescription = document.getElementById('roleDescription');
+  const roleCtaBtn = document.getElementById('roleCtaBtn');
+  const roleCtaText = document.getElementById('roleCtaText');
+
+  // Update Tab Active Classes
+  tabButtons.forEach((btn, otherIdx) => {
+    if (otherIdx === idx) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  const data = roleData[idx];
+  if (!data) return;
+
+  function renderData() {
+    if (roleBadge) roleBadge.textContent = data.badge;
+    if (roleIndexLabel) roleIndexLabel.textContent = data.indexLabel;
+    if (roleTitle) roleTitle.textContent = data.title;
+    if (roleSubtitle) roleSubtitle.textContent = data.subtitle;
+    if (roleDescription) roleDescription.textContent = data.description;
+    if (roleCtaText) roleCtaText.textContent = data.ctaText;
+    if (roleCtaBtn) roleCtaBtn.href = data.ctaUrl;
+  }
+
+  if (typeof gsap !== 'undefined') {
+    gsap.to(detailStage, {
+      opacity: 0.2,
+      y: 6,
+      duration: 0.12,
+      ease: 'power2.in',
+      onComplete: () => {
+        renderData();
+        gsap.to(detailStage, {
+          opacity: 1,
+          y: 0,
+          duration: 0.25,
+          ease: 'power2.out'
+        });
+      }
+    });
+  } else {
+    renderData();
+  }
+};
+
+/* -------------------------------------------------------------
+ * 10. HOW IT WORKS — ARCHITECTURAL STEPPER MOTION (GSAP)
  * ------------------------------------------------------------- */
 function initWorkflowStepperScroll() {
   const monolith = document.getElementById('howItWorksMonolith');
   if (!monolith) return;
 
   const panels = monolith.querySelectorAll('.how-it-works-panel');
-
   if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && panels.length) {
     gsap.fromTo(
       panels,
@@ -1544,6 +1642,19 @@ function initWorkflowStepperScroll() {
       }
     );
   }
+}
+
+function initPlatformRolesSwitcher() {
+  const tabsList = document.getElementById('roleTabsList');
+  if (!tabsList) return;
+
+  const tabButtons = tabsList.querySelectorAll('.role-tab-btn');
+  tabButtons.forEach((btn, idx) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.switchPlatformRole(idx);
+    });
+  });
 }
 
 

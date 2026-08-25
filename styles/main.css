@@ -82,6 +82,57 @@ h1, h2, h3, .font-heading {
   background-size: 32px 32px;
 }
 
+/* Role Tab Buttons (Ecosystem 4 Roles) */
+.role-tab-btn {
+  background-color: #FFFFFF;
+  color: #0E1C2F;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.role-tab-btn:hover {
+  border-color: #C8A84B;
+  background-color: #F8FAFC;
+}
+
+.role-tab-btn.active,
+.role-tab-btn.active:hover {
+  background-color: #0E1C2F !important;
+  color: #FFFFFF !important;
+  border-color: #0E1C2F !important;
+  box-shadow: 0 10px 25px -5px rgba(14, 28, 47, 0.25) !important;
+}
+
+.role-tab-btn.active .role-tab-title,
+.role-tab-btn.active:hover .role-tab-title {
+  color: #FFFFFF !important;
+}
+
+.role-tab-btn.active .role-tab-subtitle,
+.role-tab-btn.active:hover .role-tab-subtitle {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.role-tab-btn.active .role-tab-num,
+.role-tab-btn.active:hover .role-tab-num {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #C8A84B !important;
+}
+
+.role-tab-btn:not(.active) .role-tab-title {
+  color: #0E1C2F;
+}
+
+.role-tab-btn:not(.active) .role-tab-subtitle {
+  color: #64748B;
+}
+
+.role-tab-btn:not(.active) .role-tab-num {
+  background-color: #F1F5F9;
+  color: #64748B;
+}
+
+
 /* Custom CTA Shimmer & Pulse */
 @keyframes shimmer {
   0% { transform: translateX(-100%); }

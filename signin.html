@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — mCapital | Sovereign Diaspora Wealth & Investment Management</title>
+  <meta name="description" content="Sign in to your mCapital portal to track your private investments, fund allocations, and capital distributions.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Custom Main CSS -->
+  <link rel="stylesheet" href="styles/main.css?v=2.4">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            midnight: {
+              DEFAULT: '#0E1C2F',
+              800: '#182E4B',
+              900: '#0E1C2F',
+            },
+            gold: {
+              400: '#D8C074',
+              500: '#C8A84B',
+              600: '#C8A84B',
+              700: '#A88C35',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#FAFBF9] text-slate-900 min-h-screen flex flex-col font-sans antialiased">
+
+  <main class="w-full min-h-screen grid grid-cols-1 lg:grid-cols-12">
+    
+    <!-- LEFT COLUMN: INSTITUTIONAL BRANDING & TRUST STAGE (5 COLS) -->
+    <div class="lg:col-span-5 bg-midnight text-white p-8 sm:p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden hidden md:flex min-h-[500px] lg:min-h-screen">
+      
+      <!-- Background Ambient Glow & Grid -->
+      <div class="absolute inset-0 bg-gradient-to-br from-gold-500/[0.07] via-transparent to-black/40 pointer-events-none"></div>
+      <div class="absolute -top-32 -left-32 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-32 -right-32 w-96 h-96 bg-slate-700/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Top Header / Logo -->
+      <div class="relative z-10">
+        <a href="index.html" class="inline-flex items-center gap-3.5 group">
+          <div class="h-10 w-auto flex items-center justify-center p-1.5 rounded-lg bg-white/10 border border-white/15 backdrop-blur-md group-hover:border-gold-400/50 transition-colors">
+            <img src="asset/logo.png" alt="mCapital Logo" class="h-7 w-auto object-contain brightness-110">
+          </div>
+          <span class="text-2xl font-black tracking-tight text-white group-hover:text-gold-400 transition-colors">
+            mCapital
+          </span>
+        </a>
+      </div>
+
+      <!-- Middle: Governance Endorsement & Quote -->
+      <div class="space-y-6 relative z-10 my-auto py-12">
+        
+        <!-- Eyebrow Pill -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-gold-400 text-xs font-mono font-bold uppercase tracking-wider backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+          <span>BSEC REGULATED SOVEREIGN PLATFORM</span>
+        </div>
+
+        <!-- Headline & Quote -->
+        <div class="space-y-4">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
+            Institutional diaspora wealth, securely managed.
+          </h2>
+          
+          <div class="p-6 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-md space-y-4">
+            <p class="text-sm text-slate-300 italic leading-relaxed">
+              “Transparent financial stewardship and BSEC compliance are the cornerstone of diaspora wealth growth in Bangladesh.”
+            </p>
+            <div class="flex items-center gap-3 pt-2 border-t border-white/10">
+              <img src="asset/Dr. Ahsan H. Mansur.jpg" alt="Dr. Ahsan H. Mansur" class="w-10 h-10 rounded-full object-cover border border-gold-500/50">
+              <div>
+                <h4 class="text-xs font-bold text-white">Dr. Ahsan H. Mansur</h4>
+                <p class="text-[11px] text-gold-400 font-medium">Chairman, mCapital Ltd. · Former Governor, Bangladesh Bank</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Quick KPI Strips -->
+        <div class="grid grid-cols-3 gap-3 pt-2">
+          <div class="border-l-2 border-gold-500 pl-3 py-1 space-y-0.5">
+            <span class="text-xl font-bold text-white block">$1.47B</span>
+            <span class="text-[10px] text-slate-400 uppercase font-mono tracking-wider">AUM Volume</span>
+          </div>
+          <div class="border-l-2 border-gold-500 pl-3 py-1 space-y-0.5">
+            <span class="text-xl font-bold text-white block">12,000+</span>
+            <span class="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Investors</span>
+          </div>
+          <div class="border-l-2 border-gold-500 pl-3 py-1 space-y-0.5">
+            <span class="text-xl font-bold text-white block">30</span>
+            <span class="text-[10px] text-slate-400 uppercase font-mono tracking-wider">Countries</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Trust Badge Footer -->
+      <div class="relative z-10 pt-6 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 font-mono">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-gold-400"></i>
+          <span>256-bit Bank Grade Security</span>
+        </div>
+        <span>© 2026 mCapital</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: FRICTIONLESS SIGN IN FORM (7 COLS) -->
+    <div class="lg:col-span-7 bg-[#FAFBF9] flex flex-col justify-between p-6 sm:p-10 lg:p-16">
+      
+      <!-- Top Bar: Navigation Link & Switch Action -->
+      <div class="flex items-center justify-between gap-4 pb-8">
+        <a href="index.html" class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-midnight transition-colors">
+          <i class="fa-solid fa-arrow-left text-[10px]"></i>
+          <span>Back to Home</span>
+        </a>
+
+        <div class="text-xs text-slate-500">
+          <span>New to mCapital?</span>
+          <a href="signup.html" class="font-bold text-gold-700 hover:text-midnight underline ml-1 transition-colors">
+            Create account
+          </a>
+        </div>
+      </div>
+
+      <!-- Main Form Container -->
+      <div class="max-w-md w-full mx-auto space-y-8 my-auto py-6">
+        
+        <!-- Mobile Logo (Shown only on small screens) -->
+        <div class="md:hidden flex items-center gap-3">
+          <img src="asset/logo.png" alt="mCapital Logo" class="h-8 w-auto">
+          <span class="text-xl font-black tracking-tight text-midnight">mCapital</span>
+        </div>
+
+        <!-- Form Heading -->
+        <div class="space-y-2">
+          <h1 class="text-3xl sm:text-4xl font-bold text-midnight tracking-tight">
+            Welcome back
+          </h1>
+          <p class="text-sm text-slate-500 leading-relaxed">
+            Sign in to access your investment portfolio, capital commitments, and distributions.
+          </p>
+        </div>
+
+        <!-- Fast One-Click Social Auth -->
+        <div class="space-y-3">
+          <button type="button" class="w-full py-3 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold flex items-center justify-center gap-3 shadow-xs hover:border-slate-400 transition-all">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
+
+          <!-- Divider -->
+          <div class="relative flex items-center justify-center py-2">
+            <div class="border-t border-slate-200 w-full"></div>
+            <span class="bg-[#FAFBF9] px-3 text-[11px] font-mono text-slate-400 uppercase tracking-wider relative">
+              or continue with email
+            </span>
+          </div>
+        </div>
+
+        <!-- Credentials Form -->
+        <form id="signinForm" class="space-y-5">
+          
+          <!-- Email Input -->
+          <div class="space-y-1.5">
+            <label for="signinEmail" class="block text-xs font-bold text-slate-700 tracking-wide">
+              Email Address
+            </label>
+            <div class="relative rounded-xl shadow-xs">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-regular fa-envelope text-xs"></i>
+              </div>
+              <input 
+                type="email" 
+                id="signinEmail" 
+                name="email" 
+                required 
+                placeholder="name@example.com"
+                class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all"
+              >
+            </div>
+          </div>
+
+          <!-- Password Input -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="signinPassword" class="block text-xs font-bold text-slate-700 tracking-wide">
+                Password
+              </label>
+              <a href="#" class="text-xs font-semibold text-gold-700 hover:text-midnight underline transition-colors">
+                Forgot password?
+              </a>
+            </div>
+            <div class="relative rounded-xl shadow-xs">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-lock text-xs"></i>
+              </div>
+              <input 
+                type="password" 
+                id="signinPassword" 
+                name="password" 
+                required 
+                placeholder="••••••••••••"
+                class="w-full pl-10 pr-11 py-3 rounded-xl border border-slate-300 bg-white text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all"
+              >
+              <button 
+                type="button" 
+                class="password-toggle-btn absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors"
+                data-target="signinPassword"
+                title="Toggle password visibility"
+              >
+                <i class="fa-regular fa-eye text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember Me Checkbox -->
+          <div class="flex items-center">
+            <input 
+              id="rememberMe" 
+              name="rememberMe" 
+              type="checkbox" 
+              class="w-4 h-4 text-gold-600 rounded border-slate-300 focus:ring-gold-500 focus:ring-offset-0 cursor-pointer"
+            >
+            <label for="rememberMe" class="ml-2.5 block text-xs text-slate-600 cursor-pointer select-none">
+              Remember my device for 30 days
+            </label>
+          </div>
+
+          <!-- Primary Submit Button -->
+          <div class="pt-2">
+            <button 
+              type="submit" 
+              class="btn-fill-left w-full py-3.5 px-6 rounded-full font-bold text-xs sm:text-sm text-white bg-midnight hover:text-white border border-midnight shadow-md shadow-midnight/20 flex items-center justify-center gap-2.5 transition-all"
+              style="--fill-color: #C8A84B;"
+            >
+              <span>Sign In to Portal</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Compliance & Security Note -->
+        <div class="pt-4 border-t border-slate-200/80 text-center">
+          <p class="text-[11px] text-slate-400 font-mono flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-lock text-gold-600"></i>
+            <span>Encrypted 256-bit SSL · BSEC Audited Governance</span>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Right Footer Legal Links -->
+      <div class="pt-6 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
+        <span>© 2026 mCapital Ltd.</span>
+        <div class="flex items-center gap-4">
+          <a href="#" class="hover:text-slate-600 transition-colors">Privacy Policy</a>
+          <a href="#" class="hover:text-slate-600 transition-colors">Terms of Service</a>
+          <a href="#" class="hover:text-slate-600 transition-colors">Security Disclosures</a>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Auth JS -->
+  <script src="js/auth.js"></script>
+  <!-- Live Chat Concierge JS -->
+  <script src="js/chat.js"></script>
+</body>
+</html>
